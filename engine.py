@@ -19,6 +19,7 @@
 
 import attrs
 import numpy as np
+from randomizer import Randomizer
 
 
 @attrs.define
@@ -44,7 +45,24 @@ class Config:
 class Engine:
     _state: State
     _cfg: Config
+    _rand: Randomizer
 
     def __init__(self, state: State, cfg: Config):
         self._state = state
         self._cfg = cfg
+        self._rand = Randomizer()
+
+        ## sanity checks
+        if (
+            self._state.p.shape != self._state.v.shape
+            or self._state.p.shape != self._state.a.shape
+            or self._cfg.uw.shape != (self._state.p.shape[0], 4)
+        ):
+            raise ValueError(
+                "Inconsistent shapes: p={0} v={1} a={2} uw={3}".format(
+                    self._state.p.shape,
+                    self._state.v.shape,
+                    self._state.a.shape,
+                    self._cfg.uw.shape,
+                )
+            )

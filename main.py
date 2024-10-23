@@ -50,7 +50,7 @@ def create_config():
         u2_p=1.0,
         u2_dopt=1.0,
         u4=2.0,
-        uw=r.gen_epsilon_matrix((FISHES_BY_DIM, 4)),
+        uw=r.gen_epsilon_matrix((FISHES_BY_DIM**2, 4)),
     )
 
 
