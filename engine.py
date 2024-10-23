@@ -101,8 +101,22 @@ class Engine:
         self._state.p += self._state.v * timestep
 
     def _calculate_urgency1(self, distances):
-        # stub
-        return np.zeros_like(self._state.a)
+        # Select all fishes that are in range of one another
+        in_range = np.logical_and(distances > 0, distances <= self._cfg.d_max)
+        # To calculate the baricenter that each fish is affected by,
+        # generate a weights matrix first. This matrix embeds how much
+        # each other fish contributes to the final baricenter
+        # experienced by any given fish.
+        weights = np.zeros_like(in_range, dtype=float)
+        np.divide(1.0, np.count_nonzero(in_range, axis=1, keepdims=1),
+                  where=in_range, out=weights)
+        # Calculate the baricenter for each fish. This is a (d, n)
+        # matrix.
+        baricenters = self._state.p.T @ weights.T
+        # Calculate the vector first (with epsilson)
+        u1_vector = (baricenters.T - self._state.p) * self._rand.gen_epsilon_matrix(self._state.p.shape)
+        # Multiply by the appropriate weights.
+        return u1_vector * self._cfg.u1_p * self._cfg.uw[:,0].reshape((-1, 1))
 
     def _calculate_urgency2(self, distances):
         # stub
