@@ -29,4 +29,9 @@ class Randomizer:
         self._rng = np.random.default_rng()
 
     def gen_epsilon_matrix(self, shape: Tuple):
-        return self._rng.random(size=shape) * (2 * EPSILON) + (1 - EPSILON)
+        return self.gen_random_matrix(
+            shape, min_value=1.0 - EPSILON, max_value=1.0 + EPSILON
+        )
+
+    def gen_random_matrix(self, shape: Tuple, *, min_value: float, max_value: float):
+        return (max_value - min_value) * self._rng.random(size=shape) + min_value

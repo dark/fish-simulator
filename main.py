@@ -54,7 +54,9 @@ def create_config():
         u2_p=1.0,
         u2_dopt=1.0,
         u4=2.0,
-        uw=r.gen_epsilon_matrix((FISHES_BY_DIM**SPACE_DIMENSIONS, 4)),
+        uw=r.gen_random_matrix(
+            (FISHES_BY_DIM**SPACE_DIMENSIONS, 4), min_value=0.9, max_value=1.0
+        ),
     )
 
 
