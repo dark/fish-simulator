@@ -36,8 +36,8 @@ def cartesian(array, dimensions):
 def create_initial_state():
     one_dim = np.arange(-(FISHES_BY_DIM / 2), FISHES_BY_DIM / 2, dtype=int)
     p = cartesian(one_dim, SPACE_DIMENSIONS)
-    v = np.zeros((FISHES_BY_DIM**2, SPACE_DIMENSIONS))
-    a = np.zeros((FISHES_BY_DIM**2, SPACE_DIMENSIONS))
+    v = np.zeros((FISHES_BY_DIM**SPACE_DIMENSIONS, SPACE_DIMENSIONS))
+    a = np.zeros((FISHES_BY_DIM**SPACE_DIMENSIONS, SPACE_DIMENSIONS))
     return p, v, a
 
 
@@ -50,7 +50,7 @@ def create_config():
         u2_p=1.0,
         u2_dopt=1.0,
         u4=2.0,
-        uw=r.gen_epsilon_matrix((FISHES_BY_DIM**2, 4)),
+        uw=r.gen_epsilon_matrix((FISHES_BY_DIM**SPACE_DIMENSIONS, 4)),
     )
 
 
