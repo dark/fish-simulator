@@ -18,9 +18,11 @@
 #
 
 import numpy as np
-import scipy
+from engine import Config, Engine, State
+from randomizer import Randomizer
 
 SPACE_DIMENSIONS = 2
+FISHES_BY_DIM = 11
 
 
 def cartesian(array, dimensions):
@@ -32,14 +34,27 @@ def cartesian(array, dimensions):
 
 
 def create_initial_state():
-    FISHES_BY_DIM = 11
-
     one_dim = np.arange(-(FISHES_BY_DIM / 2), FISHES_BY_DIM / 2, dtype=int)
     p = cartesian(one_dim, SPACE_DIMENSIONS)
-    v = np.zeros((11**2, SPACE_DIMENSIONS))
-    a = np.zeros((11**2, SPACE_DIMENSIONS))
+    v = np.zeros((FISHES_BY_DIM**2, SPACE_DIMENSIONS))
+    a = np.zeros((FISHES_BY_DIM**2, SPACE_DIMENSIONS))
     return p, v, a
 
 
+def create_config():
+    r = Randomizer()
+    return Config(
+        a_max=1.0,
+        d_max=5.0,
+        u1_p=1.0,
+        u2_p=1.0,
+        u2_dopt=1.0,
+        u4=2.0,
+        uw=r.gen_epsilon_matrix((FISHES_BY_DIM, 4)),
+    )
+
+
 p, v, a = create_initial_state()
-print(p)
+s = State(p, v, a)
+cfg = create_config()
+engine = Engine(s, cfg)
