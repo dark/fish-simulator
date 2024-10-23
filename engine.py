@@ -97,8 +97,8 @@ class Engine:
         # Add epsilon uncertainty to final acceleration matrix
         self._state.a *= self._rand.gen_epsilon_matrix(self._state.a.shape)
         # Edit velocity and position state accordingly
-        self._state.v += self._state.a / timestep
-        self._state.p += self._state.v / timestep
+        self._state.v += self._state.a * timestep
+        self._state.p += self._state.v * timestep
 
     def _calculate_urgency1(self, distances):
         # stub
