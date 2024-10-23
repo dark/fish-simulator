@@ -34,8 +34,11 @@ def cartesian(array, dimensions):
 
 
 def create_initial_state():
+    # Cast to int necessary to make initial spacing nicer in this
+    # sample configuration.
     one_dim = np.arange(-(FISHES_BY_DIM / 2), FISHES_BY_DIM / 2, dtype=int)
-    p = cartesian(one_dim, SPACE_DIMENSIONS)
+    # Re-casting to float because that's what all matrices use.
+    p = cartesian(one_dim, SPACE_DIMENSIONS).astype(float)
     v = np.zeros((FISHES_BY_DIM**SPACE_DIMENSIONS, SPACE_DIMENSIONS))
     a = np.zeros((FISHES_BY_DIM**SPACE_DIMENSIONS, SPACE_DIMENSIONS))
     return p, v, a
@@ -46,6 +49,7 @@ def create_config():
     return Config(
         a_max=1.0,
         d_max=5.0,
+        u_max=1.0,
         u1_p=1.0,
         u2_p=1.0,
         u2_dopt=1.0,
@@ -58,3 +62,4 @@ p, v, a = create_initial_state()
 s = State(p, v, a)
 cfg = create_config()
 engine = Engine(s, cfg)
+engine.run(timestep=0.1, iterations=100)

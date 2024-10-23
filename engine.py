@@ -19,6 +19,8 @@
 
 import attrs
 import numpy as np
+import scipy
+from utils import Utils
 from randomizer import Randomizer
 
 
@@ -34,6 +36,7 @@ class Config:
     # Species-wide config
     a_max: float  # max linear acceleration (species-wide)
     d_max: float  # max sight distance (species-wide)
+    u_max: float  # urgency value (absolute) that corresponds to a_max (species-wide)
     u1_p: float  # linear parameter for the 1st urgency component (species-wide)
     u2_p: float  # linear parameter for the 2nd urgency component (species-wide)
     u2_dopt: float  # optimal distance for the 2nd urgency component (species-wide)
@@ -66,3 +69,45 @@ class Engine:
                     self._cfg.uw.shape,
                 )
             )
+
+    def run(self, *, timestep: float, iterations: int):
+        """Run the simulation."""
+        for iteration in range(iterations):
+            current_time = timestep * iteration
+            print(
+                "Excuting iteration {}/{}, time: {}s".format(
+                    iteration + 1, iterations, current_time
+                )
+            )
+            self._step(timestep)
+
+    def _step(self, timestep: float):
+        """Execute one step of the simulation."""
+        distances = scipy.spatial.distance.squareform(
+            scipy.spatial.distance.pdist(self._state.p)
+        )
+        # Calculate every single urgency
+        u1 = self._calculate_urgency1(distances)
+        u2 = self._calculate_urgency2(distances)
+        u4 = self._calculate_urgency4(distances)
+        # Calculate and clip the total urgency
+        u_tot = u1 + u2 + u4
+        self._state.a = u_tot / self._cfg.u_max * self._cfg.a_max
+        Utils.inplace_clip_by_abs(self._state.a, self._cfg.a_max)
+        # Add epsilon uncertainty to final acceleration matrix
+        self._state.a *= self._rand.gen_epsilon_matrix(self._state.a.shape)
+        # Edit velocity and position state accordingly
+        self._state.v += self._state.a / timestep
+        self._state.p += self._state.v / timestep
+
+    def _calculate_urgency1(self, distances):
+        # stub
+        return np.zeros_like(self._state.a)
+
+    def _calculate_urgency2(self, distances):
+        # stub
+        return np.zeros_like(self._state.a)
+
+    def _calculate_urgency4(self, distances):
+        # stub
+        return np.zeros_like(self._state.a)
