@@ -22,6 +22,7 @@ import numpy as np
 import scipy
 from utils import Utils
 from randomizer import Randomizer
+from typing import List
 
 
 @attrs.define
@@ -70,8 +71,9 @@ class Engine:
                 )
             )
 
-    def run(self, *, timestep: float, iterations: int):
-        """Run the simulation."""
+    def run(self, *, timestep: float, iterations: int) -> List[State]:
+        """Run the simulation, return a snapshot of all states."""
+        states = [self._state]
         for iteration in range(iterations):
             current_time = timestep * iteration
             print(
@@ -80,6 +82,8 @@ class Engine:
                 )
             )
             self._step(timestep)
+            states.append(self._state)
+        return states
 
     def _step(self, timestep: float):
         """Execute one step of the simulation."""

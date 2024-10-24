@@ -20,6 +20,7 @@
 import numpy as np
 from engine import Config, Engine, State
 from randomizer import Randomizer
+from typing import List
 
 SPACE_DIMENSIONS = 2
 FISHES_BY_DIM = 11
@@ -60,8 +61,22 @@ def create_config():
     )
 
 
-p, v, a = create_initial_state()
-s = State(p, v, a)
-cfg = create_config()
-engine = Engine(s, cfg)
-engine.run(timestep=0.1, iterations=100)
+def reparse_for_manim(state_history: List[State]) -> List[np.typing.NDArray]:
+    point_histories = []
+    number_of_points = len(state_history[0].p)
+    for idx in range(0, number_of_points):
+        array = np.array([s.p[idx] for s in state_history])
+        point_histories.append(array)
+    return point_histories
+
+
+def prepare():
+    p, v, a = create_initial_state()
+    s = State(p, v, a)
+    cfg = create_config()
+    engine = Engine(s, cfg)
+    state_history = engine.run(timestep=0.1, iterations=100)
+    manimd = reparse_for_manim(state_history)
+
+
+prepare()
