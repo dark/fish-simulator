@@ -18,6 +18,7 @@
 #
 
 import attrs
+import copy
 import numpy as np
 import scipy
 from utils import Utils
@@ -73,7 +74,7 @@ class Engine:
 
     def run(self, *, timestep: float, iterations: int) -> List[State]:
         """Run the simulation, return a snapshot of all states."""
-        states = [self._state]
+        states = [copy.deepcopy(self._state)]
         for iteration in range(iterations):
             current_time = timestep * iteration
             print(
@@ -82,7 +83,7 @@ class Engine:
                 )
             )
             self._step(timestep)
-            states.append(self._state)
+            states.append(copy.deepcopy(self._state))
         return states
 
     def _step(self, timestep: float):
