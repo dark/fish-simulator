@@ -53,7 +53,7 @@ class TwoDimensionsGrid:
         return Config(
             v_max=1.0,
             a_max=1.0,
-            d_max=1.0,
+            d_max=5.0,
             u_max=1.0,
             u1_p=1.0,
             u2_p=1.0,
