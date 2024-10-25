@@ -51,7 +51,7 @@ class TwoDimensionsGrid:
     def _create_config(self):
         r = Randomizer()
         return Config(
-            v_max=1.0,
+            v_max=5.0,
             a_max=1.0,
             d_max=5.0,
             u_max=1.0,
