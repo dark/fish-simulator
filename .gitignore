@@ -1,2 +1,4 @@
 # Ignore temporary Python dierctory stuff
 __pycache__
+# Ignore directory where manim dumps all outputs
+media/
