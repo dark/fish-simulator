@@ -23,7 +23,7 @@ from typing import List
 
 class Utils:
     def inplace_clip_by_abs(input: np.typing.NDArray, max_abs: float):
-        """Clips rows of a (n, d) matrix so that abs(row)<=max_abs."""
+        """Clips row values of a (n, d) matrix so that abs(row)<=max_abs."""
         sum_of_squares = np.sum(input**2, axis=1, keepdims=1)
         clipped = sum_of_squares > (max_abs**2)
         scale_factors = np.ones_like(sum_of_squares)

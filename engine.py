@@ -36,6 +36,7 @@ class State:
 @attrs.frozen(kw_only=True)
 class Config:
     # Species-wide config
+    v_max: float  # max linear velocity (species-wide)
     a_max: float  # max linear acceleration (species-wide)
     d_max: float  # max sight distance (species-wide)
     u_max: float  # urgency value (absolute) that corresponds to a_max (species-wide)
@@ -103,6 +104,7 @@ class Engine:
         self._state.a *= self._rand.gen_epsilon_matrix(self._state.a.shape)
         # Edit velocity and position state accordingly
         self._state.v += self._state.a * timestep
+        Utils.inplace_clip_by_abs(self._state.v, self._cfg.v_max)
         self._state.p += self._state.v * timestep
 
     def _calculate_urgency1(self, distances):
