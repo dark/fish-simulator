@@ -61,14 +61,15 @@ class TwoDimensionsGridDisplay(Scene):
         # How long the trail is compared to the overall runtime
         trail_ratio = trail_duration / run_time
 
-        # Slightly extend the duration of the overall animation, to
-        # account for the time needed to fade out the trail at the end.
         self.play(
             *(
                 ShowPassingFlash(
                     curve,
                     time_width=trail_ratio,
                     rate_func=linear,
+                    # Slightly extend the duration of the overall
+                    # animation, to account for the time needed to
+                    # fade out the trail at the end.
                     run_time=run_time + trail_duration,
                 )
                 for curve in curves
