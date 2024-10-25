@@ -22,6 +22,16 @@ from examples import TwoDimensionsGrid
 from utils import Utils
 
 
+class SecondsCounter(Animation):
+    def __init__(self, number: DecimalNumber, **kwargs) -> None:
+        # Pass number as the mobject of the animation
+        super().__init__(number, **kwargs)
+
+    def interpolate_mobject(self, alpha: float) -> None:
+        # Set value of DecimalNumber according to alpha
+        self.mobject.set_value(alpha)
+
+
 class TwoDimensionsGridDisplay(Scene):
     def construct(self):
         # Set up a set of x,y axes. The key to keep a proper square
@@ -61,6 +71,20 @@ class TwoDimensionsGridDisplay(Scene):
         # How long the trail is compared to the overall runtime
         trail_ratio = trail_duration / run_time
 
+        # Display a seconds timer in the top left
+        seconds_text = (
+            Text("Runtime:", font_size=32)
+            .set_color(WHITE)
+            .shift(LEFT * 6)
+            .shift(UP * 3.5)
+        )
+        seconds_number = (
+            DecimalNumber(num_decimal_places=1, unit="s")
+            .set_color(WHITE)
+            .next_to(seconds_text, RIGHT)
+        )
+        self.add(seconds_text, seconds_number)
+
         self.play(
             *(
                 ShowPassingFlash(
@@ -74,4 +98,5 @@ class TwoDimensionsGridDisplay(Scene):
                 )
                 for curve in curves
             ),
+            SecondsCounter(seconds_number)
         )
