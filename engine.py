@@ -126,10 +126,10 @@ class Engine:
             out=weights,
         )
         # Calculate the baricenter as witnessed by each particle. This
-        # is a (d, n) matrix.
-        baricenters = self._state.p.T @ weights.T
+        # is a (n, d) matrix.
+        baricenters = weights @ self._state.p
         # Calculate the vector first (with epsilson)
-        u1_vector = (baricenters.T - self._state.p) * self._rand.gen_epsilon_matrix(
+        u1_vector = (baricenters - self._state.p) * self._rand.gen_epsilon_matrix(
             self._state.p.shape
         )
         # Multiply by the appropriate weights.
