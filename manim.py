@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 #
-#  Simulate and display movement of a fish school
+#  Simulate and display movement of particles in a system
 #  Copyright (C) 2024  Marco Leogrande
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -55,7 +55,8 @@ class TwoDimensionsGridDisplay(Scene):
         )
         point_histories = Utils.repack_state_histories_for_manim(state_histories)
 
-        # Define a curve for each actor in the simulation, and give it a unique color
+        # Define a curve for each particle in the simulation, and give
+        # it a unique color.
         curves = VGroup()
         colors = color_gradient([BLUE_E, BLUE_A], len(point_histories))
         for points, color in zip(point_histories, colors):
@@ -63,8 +64,8 @@ class TwoDimensionsGridDisplay(Scene):
             curve.set_stroke(color, 3, opacity=1)
             curves.add(curve)
 
-        # We want to display the position of each actor, with a small
-        # "trail" behind it.
+        # We want to display the position of each particle, with a
+        # small "trail" behind it.
         #
         # Duration of the trail, in seconds.
         trail_duration = 0.25

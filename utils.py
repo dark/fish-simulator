@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 #
-#  Simulate and display movement of a fish school
+#  Simulate and display movement of particles in a system
 #  Copyright (C) 2024  Marco Leogrande
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -38,10 +38,11 @@ class Utils:
         Engine operations return a list of entries, where each entry
         is the state of the engine at that iteration. Manim requires
         instead a different list, where each entry represents all the
-        positions that a specific agent (fish) went through in the
+        positions that a specific particle went through in the
         simulation.
 
         This method converts from the former to the latter format.
+
         """
         point_histories = []
         number_of_points = len(state_history[0].p)

@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 #
-#  Simulate and display movement of a fish school
+#  Simulate and display movement of particles in a system
 #  Copyright (C) 2024  Marco Leogrande
 #
 #  This program is free software: you can redistribute it and/or modify
@@ -108,12 +108,12 @@ class Engine:
         self._state.p += self._state.v * timestep
 
     def _calculate_urgency1(self, distances):
-        # Select all fishes that are in range of one another
+        # Select all particles that are in range of one another
         in_range = np.logical_and(distances > 0, distances <= self._cfg.d_max)
-        # To calculate the baricenter that each fish is affected by,
-        # generate a weights matrix first. This matrix embeds how much
-        # each other fish contributes to the final baricenter
-        # experienced by any given fish.
+        # To calculate the baricenter that each particle is affected
+        # by, generate a weights matrix first. This matrix embeds how
+        # much each other particle contributes to the final baricenter
+        # experienced by any given particle.
         weights = np.zeros_like(in_range, dtype=float)
         np.divide(
             1.0,
@@ -121,7 +121,7 @@ class Engine:
             where=in_range,
             out=weights,
         )
-        # Calculate the baricenter for each fish. This is a (d, n)
+        # Calculate the baricenter for each particle. This is a (d, n)
         # matrix.
         baricenters = self._state.p.T @ weights.T
         # Calculate the vector first (with epsilson)

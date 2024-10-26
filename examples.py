@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 #
-#  Simulate and display movement of a fish school
+#  Simulate and display movement of particles in a system
 #  Copyright (C) 2024  Marco Leogrande
 #
 #  This program is free software: you can redistribute it and/or modify

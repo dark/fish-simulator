@@ -1,5 +1,5 @@
-# Simulate and display movement of a fish school
+# Simulate and display movement of particles in a system
 
-A toy project to display movements of actors in a group (e.g. fishes
-in a school, or birds in a flock) using mathematical notations,
-`numpy`/`scipy` and `manim`.
+A toy project to simulate and display movements of particles in a
+system (e.g. fishes in a school, or birds in a flock) using
+mathematical notations, `numpy`/`scipy` and `manim`.
