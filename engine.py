@@ -139,8 +139,58 @@ class Engine:
         """
         Avoids each particle from getting too close to other particles.
         """
-        # stub
-        return np.zeros_like(self._state.a)
+        # Select all particles that, for this component, have an
+        # effect on one another.
+        in_range = np.logical_and(distances > 0, distances <= self._cfg.u2_dopt)
+        # Generate weights for how much each particle affects another.
+        weights = np.zeros_like(in_range, dtype=float)
+        # The weight formula is:
+        #
+        # weight = desired_length / initial_length
+        #        = ((_cfg.u2_dopt - initial_length)/_cfg.u2_dopt) / initial_length
+        #        = (_cfg.u2_dopt - initial_length) / (_cfg.u2_dopt * initial_length)
+        np.divide(
+            self._cfg.u2_dopt - distances,
+            self._cfg.u2_dopt * distances,
+            where=in_range,
+            out=weights,
+        )
+        # The weights need to be applied to the distance vector
+        # existing between each pair of particles. Hence, we need to
+        # compute all such vector distances.
+        #
+        # This results in a (n, n, d) matrix.
+        #
+        # Note also that the difference is computed as (particle -
+        # other_particle), because this is a repulsive force: the
+        # vector points from the other particle to the given one. The
+        # way which Numpy broadcasting works, this requires
+        # "extending" the first array, so we can keep `particle`
+        # constant while we "iterate" over `other_particle`.
+        distance_vectors = self._state.p[:, np.newaxis] - self._state.p
+
+        # Calculate the total effect on each particle (with
+        # epsilson). The operation applies a matrix multiplication
+        # separately on each last two dimensions. In other words:
+        #
+        # (n, a, b) * (n, b, c) -> (n, a, c)
+        #
+        # for each of the n matrices in the leftmost dimension, compute:
+        #
+        # (a, b) @ (b, c) = (a, c)
+        #
+        # See also:
+        # https://numpy.org/devdocs/reference/routines.linalg.html#linear-algebra-on-several-matrices-at-once
+        #
+        # This requires some reshaping on the fly to make dimensions work.
+        number_of_points = self._state.p.shape[0]
+        u2_vector = np.matmul(
+            weights.reshape((number_of_points, 1, number_of_points)), distance_vectors
+        ).reshape(number_of_points, -1) * self._rand.gen_epsilon_matrix(
+            self._state.p.shape
+        )
+        # Multiply by the appropriate weights.
+        return u2_vector * self._cfg.u2_p * self._cfg.uw[:, 1].reshape((-1, 1))
 
     def _calculate_urgency4(self, distances):
         """
