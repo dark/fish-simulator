@@ -111,7 +111,8 @@ class Engine:
         """
         Attracts each particle to the baricenter of the other particles in range.
         """
-        # Select all particles that are in range of one another
+        # Select all particles that, for this component, have an
+        # effect on one another.
         in_range = np.logical_and(distances > 0, distances <= self._cfg.d_max)
         # To calculate the baricenter that each particle is affected
         # by, generate a weights matrix first. This matrix embeds how
@@ -124,8 +125,8 @@ class Engine:
             where=in_range,
             out=weights,
         )
-        # Calculate the baricenter for each particle. This is a (d, n)
-        # matrix.
+        # Calculate the baricenter as witnessed by each particle. This
+        # is a (d, n) matrix.
         baricenters = self._state.p.T @ weights.T
         # Calculate the vector first (with epsilson)
         u1_vector = (baricenters.T - self._state.p) * self._rand.gen_epsilon_matrix(
