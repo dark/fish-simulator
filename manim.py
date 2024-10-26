@@ -70,7 +70,7 @@ class TwoDimensionsGridDisplay(Scene):
             paths.add(path)
 
             dot = Dot(color=color, radius=0.03)
-            # Captuting "path" in this lambda is necessary, otherwise
+            # Capturing "path" in this lambda is necessary, otherwise
             # all dots will capture the same 'path' variable.
             dot.add_updater(lambda d, path=path: d.move_to(path.get_end()))
             trail = TracedPath(
