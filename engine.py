@@ -77,12 +77,8 @@ class Engine:
         """Run the simulation, return a snapshot of all states."""
         states = [copy.deepcopy(self._state)]
         for iteration in range(iterations):
-            current_time = timestep * iteration
-            print(
-                "Excuting iteration {}/{}, time: {}s".format(
-                    iteration + 1, iterations, current_time
-                )
-            )
+            if iteration % 10 == 9:
+                print("Simulating iteration {}/{}".format(iteration + 1, iterations))
             self._step(timestep)
             states.append(copy.deepcopy(self._state))
         return states
