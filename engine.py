@@ -108,6 +108,9 @@ class Engine:
         self._state.p += self._state.v * timestep
 
     def _calculate_urgency1(self, distances):
+        """
+        Attracts each particle to the baricenter of the other particles in range.
+        """
         # Select all particles that are in range of one another
         in_range = np.logical_and(distances > 0, distances <= self._cfg.d_max)
         # To calculate the baricenter that each particle is affected
@@ -132,9 +135,15 @@ class Engine:
         return u1_vector * self._cfg.u1_p * self._cfg.uw[:, 0].reshape((-1, 1))
 
     def _calculate_urgency2(self, distances):
+        """
+        Avoids each particle from getting too close to other particles.
+        """
         # stub
         return np.zeros_like(self._state.a)
 
     def _calculate_urgency4(self, distances):
+        """
+        Repels each particle from specially-designated "predactor" particles.
+        """
         # stub
         return np.zeros_like(self._state.a)
