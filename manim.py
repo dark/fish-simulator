@@ -55,22 +55,31 @@ class TwoDimensionsGridDisplay(Scene):
         )
         point_histories = Utils.repack_state_histories_for_manim(state_histories)
 
-        # Define a curve for each particle in the simulation, and give
-        # it a unique color.
-        curves = VGroup()
+        # We want to display the position of each particle, with a
+        # small "trail" behind it. Duration of the trail, in seconds.
+        trail_duration = 0.25
+
+        # Define a path for each particle in the simulation. The path
+        # is invisible, it is there just to guide a dot around
+        # it. Give each dot and associated trail a unique color.
+        paths = VGroup()
         colors = color_gradient([BLUE_E, BLUE_A], len(point_histories))
         for points, color in zip(point_histories, colors):
-            curve = VMobject().set_points_smoothly(axes.c2p(*points.T).T)
-            curve.set_stroke(color, 3, opacity=1)
-            curves.add(curve)
+            path = VMobject().set_points_smoothly(axes.c2p(*points.T).T)
+            path.set_stroke(width=0, opacity=0)
+            paths.add(path)
 
-        # We want to display the position of each particle, with a
-        # small "trail" behind it.
-        #
-        # Duration of the trail, in seconds.
-        trail_duration = 0.25
-        # How long the trail is compared to the overall runtime
-        trail_ratio = trail_duration / run_time
+            dot = Dot(color=color, radius=0.03)
+            # Captuting "path" in this lambda is necessary, otherwise
+            # all dots will capture the same 'path' variable.
+            dot.add_updater(lambda d, path=path: d.move_to(path.get_end()))
+            trail = TracedPath(
+                dot.get_center,
+                dissipating_time=trail_duration,
+                stroke_width=2.5,
+                stroke_color=color,
+            )
+            self.add(dot, trail)
 
         # Display a seconds timer in the top left
         seconds_text = (
@@ -87,17 +96,6 @@ class TwoDimensionsGridDisplay(Scene):
         self.add(seconds_text, seconds_number)
 
         self.play(
-            *(
-                ShowPassingFlash(
-                    curve,
-                    time_width=trail_ratio,
-                    rate_func=linear,
-                    # Slightly extend the duration of the overall
-                    # animation, to account for the time needed to
-                    # fade out the trail at the end.
-                    run_time=run_time + trail_duration,
-                )
-                for curve in curves
-            ),
-            SecondsCounter(seconds_number)
+            *(Create(path, rate_func=linear, run_time=run_time) for path in paths),
+            SecondsCounter(seconds_number),
         )
