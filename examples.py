@@ -52,6 +52,7 @@ class TwoDimensionsGrid:
         r = Randomizer()
         return Config(
             v_max=5.0,
+            v_decay=0.9,
             a_max=1.0,
             d_max=5.0,
             u_max=5.0,

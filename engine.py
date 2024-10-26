@@ -19,6 +19,7 @@
 
 import attrs
 import copy
+import math
 import numpy as np
 import scipy
 from utils import Utils
@@ -37,6 +38,7 @@ class State:
 class Config:
     # Species-wide config
     v_max: float  # max linear velocity (species-wide)
+    v_decay: float  # exponential decay parameter for the velocity vector (species-wide)
     a_max: float  # max linear acceleration (species-wide)
     d_max: float  # max sight distance (species-wide)
     u_max: float  # urgency value (absolute) that corresponds to a_max (species-wide)
@@ -99,6 +101,7 @@ class Engine:
         # Add epsilon uncertainty to final acceleration matrix
         self._state.a *= self._rand.gen_epsilon_matrix(self._state.a.shape)
         # Edit velocity and position state accordingly
+        self._state.v *= math.pow(self._cfg.v_decay, timestep)
         self._state.v += self._state.a * timestep
         Utils.inplace_clip_by_abs(self._state.v, self._cfg.v_max)
         self._state.p += self._state.v * timestep
