@@ -22,11 +22,12 @@ from typing import Tuple
 
 
 EPSILON = 0.001
+SEED = 133713371337
 
 
 class Randomizer:
     def __init__(self):
-        self._rng = np.random.default_rng()
+        self._rng = np.random.default_rng(seed=SEED)
 
     def gen_epsilon_matrix(self, shape: Tuple):
         return self.gen_random_matrix(
