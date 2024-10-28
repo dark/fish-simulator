@@ -32,6 +32,30 @@ class SecondsCounter(Animation):
         self.mobject.set_value(alpha)
 
 
+class MoveAlongPoints(Animation):
+    """
+    Move a Mobject exactly along the points provided.
+    """
+
+    def __init__(
+        self,
+        mobject: Mobject,
+        points: np.typing.NDArray,
+        **kwargs,
+    ) -> None:
+        self._points = points
+        self._last_index = len(points) - 1
+        # Pass provided mobject as the mobject of the animation
+        super().__init__(mobject, **kwargs)
+
+    def interpolate_mobject(self, alpha: float) -> None:
+        # The goal is to return the point from `self._points` at the
+        # right index in `[0, last_index]` based on
+        # `alpha*len(points)`. Due to floating point math, rounding is
+        # expected.
+        self.mobject.move_to(self._points[round(alpha * self._last_index)])
+
+
 class TwoDimensionsGridDisplay(Scene):
     def construct(self):
         # Set up a set of x,y axes. The key to keep a proper square
@@ -62,20 +86,25 @@ class TwoDimensionsGridDisplay(Scene):
         # small "trail" behind it. Duration of the trail, in seconds.
         trail_duration = 0.25
 
-        # Define a path for each particle in the simulation. The path
-        # is invisible, it is there just to guide a dot around
-        # it. Give each dot and associated trail a unique color.
-        paths = VGroup()
+        # Create an animation that will move a dot along the imaginary
+        # path that each particle follows. We do not explicitly create
+        # a path, because experimental evidence suggest that it adds a
+        # lot of overhead in Manim (presumably to keep track of all
+        # position states). Instead, we embed all points we expect to
+        # go to directly in the animation.
+        #
+        # This requires that the size of the history of each point
+        # (i.e. len(points_histories[x]], for each x) is equal to the
+        # number for frames we want to generate + 1 (i.e. indices are
+        # in the range `[0, iterations]`).
+        dot_animations = []
         colors = color_gradient([BLUE_E, BLUE_A], len(point_histories))
         for points, color in zip(point_histories, colors):
-            path = VMobject().set_points_smoothly(axes.c2p(*points.T).T)
-            path.set_stroke(width=0, opacity=0)
-            paths.add(path)
-
             dot = Dot(color=color, radius=0.03)
-            # Capturing "path" in this lambda is necessary, otherwise
-            # all dots will capture the same 'path' variable.
-            dot.add_updater(lambda d, path=path: d.move_to(path.get_end()))
+            points = axes.c2p(*points.T).T
+            dot_animation = MoveAlongPoints(dot, points, run_time=run_time)
+            dot_animations.append(dot_animation)
+
             trail = TracedPath(
                 dot.get_center,
                 dissipating_time=trail_duration,
@@ -99,6 +128,6 @@ class TwoDimensionsGridDisplay(Scene):
         self.add(seconds_text, seconds_number)
 
         self.play(
-            *(Create(path, rate_func=linear, run_time=run_time) for path in paths),
+            *dot_animations,
             SecondsCounter(seconds_number),
         )
