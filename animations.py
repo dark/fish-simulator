@@ -70,8 +70,13 @@ class TwoDimensionsGridDisplay(Scene):
         )
         self.add(axes)
 
-        # Prepare configuration options.
+        # Setup editable parameters
         run_time = 30  # in seconds
+        # We want to display the position of each particle, with a
+        # small "trail" behind it. Duration of the trail, in seconds.
+        trail_duration = 0.25
+
+        # Determine other configuration options.
         fps = config.frame_rate
         timestep = 1 / fps
         iterations = (int)(fps * run_time)
@@ -81,10 +86,6 @@ class TwoDimensionsGridDisplay(Scene):
             timestep=timestep, iterations=iterations
         )
         point_histories = Utils.repack_state_histories_for_manim(state_histories)
-
-        # We want to display the position of each particle, with a
-        # small "trail" behind it. Duration of the trail, in seconds.
-        trail_duration = 0.25
 
         # Create an animation that will move a dot along the imaginary
         # path that each particle follows. We do not explicitly create
