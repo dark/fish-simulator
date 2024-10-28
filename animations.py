@@ -46,10 +46,13 @@ class TwoDimensionsGridDisplay(Scene):
         )
         self.add(axes)
 
+        # Prepare configuration options.
+        run_time = 30  # in seconds
+        fps = config.frame_rate
+        timestep = 1 / fps
+        iterations = (int)(fps * run_time)
+
         # Run the engine to compute all position states.
-        timestep = 0.1
-        iterations = 300
-        run_time = timestep * iterations
         state_histories = TwoDimensionsGrid().run(
             timestep=timestep, iterations=iterations
         )
