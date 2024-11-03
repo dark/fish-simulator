@@ -18,7 +18,6 @@
 #
 
 from manim import *
-from examples import TwoDimensionsGrid, TwoDimensionsGridWithPredator
 from utils import Utils
 
 
@@ -56,8 +55,24 @@ class MoveAlongPoints(Animation):
         self.mobject.move_to(self._points[round(alpha * self._last_index)])
 
 
-class TwoDimensionsGridWithPredatorDisplay(Scene):
+class BaseTwoDimensionialScene(Scene):
+    def setup(self):
+        # Init editable parameters, so that we can check for them
+        # later in construct(). These should be defined in the derived
+        # scene.
+        self._config_to_render = ...
+        self._run_time = ...  # in seconds
+
     def construct(self):
+        if self._config_to_render is Ellipsis:
+            raise ValueError(
+                "_config_to_render should be defined in the derived scene before construction"
+            )
+        if self._run_time is Ellipsis:
+            raise ValueError(
+                "_run_time should be defined in the derived scene before construction"
+            )
+
         # Set up a set of x,y axes. The key to keep a proper square
         # ratio is to keep x.range/x.length == y.range/y.length.
         axes = Axes(
@@ -71,7 +86,7 @@ class TwoDimensionsGridWithPredatorDisplay(Scene):
         self.add(axes)
 
         # Setup editable parameters
-        run_time = 30  # in seconds
+        run_time = self._run_time  # in seconds
         # We want to display the position of each particle, with a
         # small "trail" behind it. Duration of the trail, in seconds.
         trail_duration = 0.25
@@ -82,7 +97,7 @@ class TwoDimensionsGridWithPredatorDisplay(Scene):
         iterations = (int)(fps * run_time)
 
         # Run the engine to compute all position states.
-        state_histories = TwoDimensionsGridWithPredator().run(
+        state_histories = self._config_to_render.run(
             timestep=timestep, iterations=iterations
         )
         point_histories = Utils.repack_particle_histories_for_manim(state_histories)
