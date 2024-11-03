@@ -29,9 +29,14 @@ from typing import List
 
 @attrs.define
 class State:
+    # Particles state
     p: np.typing.NDArray  # (n, d) vector of position state
     v: np.typing.NDArray  # (n, d) vector of velocity state
     a: np.typing.NDArray  # (n, d) vector of acceleration state
+    # Predators state
+    pred_p: np.typing.NDArray  # (n, d) vector of position state
+    pred_v: np.typing.NDArray  # (n, d) vector of velocity state
+    pred_a: np.typing.NDArray  # (n, d) vector of acceleration state
 
 
 @attrs.frozen(kw_only=True)
@@ -81,12 +86,13 @@ class Engine:
         for iteration in range(iterations):
             if iteration % 10 == 9:
                 print("Simulating iteration {}/{}".format(iteration + 1, iterations))
-            self._step(timestep)
+            self._step_particles(timestep)
+            self._step_predators(timestep)
             states.append(copy.deepcopy(self._state))
         return states
 
-    def _step(self, timestep: float):
-        """Execute one step of the simulation."""
+    def _step_particles(self, timestep: float):
+        """Execute one step of the simulation for all particles."""
         distances = scipy.spatial.distance.squareform(
             scipy.spatial.distance.pdist(self._state.p)
         )
@@ -105,6 +111,15 @@ class Engine:
         self._state.v += self._state.a * timestep
         Utils.inplace_clip_by_abs(self._state.v, self._cfg.v_max)
         self._state.p += self._state.v * timestep
+
+    def _step_predators(self, timestep: float):
+        """Execute one step of the simulation for all predators."""
+        # Predators have no urgency, so their acceleration is constant (except for the epsilon).
+        self._state.pred_a *= self._rand.gen_epsilon_matrix(self._state.pred_a.shape)
+        # Edit velocity and position state accordingly; there is no
+        # velocity decay or cap.
+        self._state.pred_v += self._state.pred_a * timestep
+        self._state.pred_p += self._state.pred_v * timestep
 
     def _calculate_urgency1(self, distances):
         """

@@ -30,10 +30,10 @@ class Utils:
         scale_factors[clipped] = np.sqrt(sum_of_squares[clipped]) / max_abs
         np.divide(input, scale_factors, out=input, where=clipped)
 
-    def repack_state_histories_for_manim(
+    def repack_particle_histories_for_manim(
         state_history: "List[State]",
     ) -> List[np.typing.NDArray]:
-        """Repacks a list of state histories to be used by Manim.
+        """Repacks a list of particle state histories to be used by Manim.
 
         Engine operations return a list of entries, where each entry
         is the state of the engine at that iteration. Manim requires
@@ -44,9 +44,23 @@ class Utils:
         This method converts from the former to the latter format.
 
         """
-        point_histories = []
-        number_of_points = len(state_history[0].p)
-        for idx in range(0, number_of_points):
+        particle_histories = []
+        number_of_particles = len(state_history[0].p)
+        for idx in range(0, number_of_particles):
             array = np.array([s.p[idx] for s in state_history])
-            point_histories.append(array)
-        return point_histories
+            particle_histories.append(array)
+        return particle_histories
+
+    def repack_predator_histories_for_manim(
+        state_history: "List[State]",
+    ) -> List[np.typing.NDArray]:
+        """Repacks a list of predator state histories to be used by Manim.
+
+        Like `repack_particle_histories_for_manim`, but for predators.
+        """
+        predator_histories = []
+        number_of_predators = len(state_history[0].pred_p)
+        for idx in range(0, number_of_predators):
+            array = np.array([s.pred_p[idx] for s in state_history])
+            predator_histories.append(array)
+        return predator_histories
