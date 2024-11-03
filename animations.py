@@ -132,21 +132,22 @@ class BaseTwoDimensionialScene(Scene):
             )
             self.add(dot, trail)
 
-        # Animate all predators
-        predator_colors = color_gradient([RED_E, RED_A], len(predator_histories))
-        for predator_points, color in zip(predator_histories, predator_colors):
-            dot = Dot(color=color, radius=0.03)
-            points = axes.c2p(*predator_points.T).T
-            dot_animation = MoveAlongPoints(dot, points, run_time=run_time)
-            dot_animations.append(dot_animation)
+        # Animate all predators, if there are any
+        if predator_histories:
+            predator_colors = color_gradient([RED_E, RED_A], len(predator_histories))
+            for predator_points, color in zip(predator_histories, predator_colors):
+                dot = Dot(color=color, radius=0.03)
+                points = axes.c2p(*predator_points.T).T
+                dot_animation = MoveAlongPoints(dot, points, run_time=run_time)
+                dot_animations.append(dot_animation)
 
-            trail = TracedPath(
-                dot.get_center,
-                dissipating_time=trail_duration,
-                stroke_width=2.5,
-                stroke_color=color,
-            )
-            self.add(dot, trail)
+                trail = TracedPath(
+                    dot.get_center,
+                    dissipating_time=trail_duration,
+                    stroke_width=2.5,
+                    stroke_color=color,
+                )
+                self.add(dot, trail)
 
         # Display a seconds timer in the top left
         seconds_text = (
