@@ -50,7 +50,7 @@ class Config:
     u1_p: float  # linear parameter for the 1st urgency component (species-wide)
     u2_p: float  # linear parameter for the 2nd urgency component (species-wide)
     u2_dopt: float  # optimal distance for the 2nd urgency component (species-wide)
-    u4: float  # linear parameter for the 4th urgency component (species-wide)
+    u4_p: float  # linear parameter for the 4th urgency component (species-wide)
     # Per-individual config
     uw: np.typing.NDArray  # (n, 4) weights for each urgency component (per-individual)
 
@@ -224,9 +224,63 @@ class Engine:
         # Multiply by the appropriate weights.
         return u2_vector * self._cfg.u2_p * self._cfg.uw[:, 1].reshape((-1, 1))
 
-    def _calculate_urgency4(self, distances):
+    def _calculate_urgency4(self, __unused_distances):
+        """Repels each particle from specially-designated "predator" particles.
+
+        The strenght of this urgency is:
+
+        * when distance < d_max: u4_p * (d_max - distance) / d_max
+        *             otherwise: 0
+
+        This means that the urgency is equal to `u4_p` if
+        `distance=0`, then it linearly decreases as distance
+        decreases, reaching `u4_p=0` when `distance=d_max.`
+
         """
-        Repels each particle from specially-designated "predactor" particles.
-        """
-        # stub
-        return np.zeros_like(self._state.a)
+        # Many of the steps in this function replicate what has been
+        # said in _calculate_urgency2, since they both deal with
+        # repulsive forces.
+        #
+        # The notable difference is that the other function deals with
+        # (n, n) matrices, where `n=number of particles`, since the
+        # notable distances are all pairwise particle distances. Here,
+        # instead, we deal with (n, p) matrices, where `n` has the
+        # same meaning, and `p=numver of predators`.
+
+        # This is a (n, p) matrix.
+        distances_from_predators = scipy.spatial.distance.cdist(
+            self._state.p, self._state.pred_p
+        )
+        # Select all particles that, for this component, are affected
+        # by a predator.
+        in_range = np.logical_and(
+            distances_from_predators > 0, distances_from_predators <= self._cfg.d_max
+        )
+        # Generate weights for how much each particle is affected.
+        weights = np.zeros_like(in_range, dtype=float)
+        np.divide(
+            self._cfg.d_max - distances_from_predators,
+            self._cfg.d_max * distances_from_predators,
+            where=in_range,
+            out=weights,
+        )
+
+        # This is a (n, p, d) matrix. This is computed as (particle -
+        # predator) for the same reasons that apply to the similar
+        # computation in _calculate_urgency2.
+        distance_vectors = self._state.p[:, np.newaxis] - self._state.pred_p
+
+        # The goal is to generate a u4_vector that is (n, d) in shape,
+        # performing the matmul magic:
+        #
+        # (n, 1, p) * (n, p, d) = (n, 1, d)
+        number_of_points = self._state.p.shape[0]
+        number_of_predators = self._state.pred_p.shape[0]
+        u4_vector = np.matmul(
+            weights.reshape((number_of_points, 1, number_of_predators)),
+            distance_vectors,
+        ).reshape(number_of_points, -1) * self._rand.gen_epsilon_matrix(
+            self._state.p.shape
+        )
+        # Multiply by the appropriate weights.
+        return u4_vector * self._cfg.u4_p * self._cfg.uw[:, 3].reshape((-1, 1))
