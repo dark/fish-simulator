@@ -184,7 +184,7 @@ class Engine:
         distance_vectors = self._state.p[:, np.newaxis] - self._state.p
 
         # Calculate the total effect on each particle (with
-        # epsilson). The operation applies a matrix multiplication
+        # epsilon). The operation applies a matrix multiplication
         # separately on each last two dimensions. In other words:
         #
         # (n, a, b) * (n, b, c) -> (n, a, c)
