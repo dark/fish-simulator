@@ -51,6 +51,7 @@ class Config:
     u2_p: float  # linear parameter for the 2nd urgency component (species-wide)
     u2_dopt: float  # optimal distance for the 2nd urgency component (species-wide)
     u4_p: float  # linear parameter for the 4th urgency component (species-wide)
+    u4_dmax: float  # maximum distance that triggers a particle escapae for the 4th urgency component (species-wide)
     # Per-individual config
     uw: np.typing.NDArray  # (n, 4) weights for each urgency component (per-individual)
 
@@ -229,12 +230,12 @@ class Engine:
 
         The strenght of this urgency is:
 
-        * when distance < d_max: u4_p * (d_max - distance) / d_max
-        *             otherwise: 0
+        * when distance < u4_dmax: u4_p * (u4_dmax - distance) / u4_dmax
+        *               otherwise: 0
 
         This means that the urgency is equal to `u4_p` if
         `distance=0`, then it linearly decreases as distance
-        decreases, reaching `u4_p=0` when `distance=d_max.`
+        decreases, reaching `u4_p=0` when `distance=u4_dmax.`
 
         """
         # Many of the steps in this function replicate what has been
@@ -254,13 +255,13 @@ class Engine:
         # Select all particles that, for this component, are affected
         # by a predator.
         in_range = np.logical_and(
-            distances_from_predators > 0, distances_from_predators <= self._cfg.d_max
+            distances_from_predators > 0, distances_from_predators <= self._cfg.u4_dmax
         )
         # Generate weights for how much each particle is affected.
         weights = np.zeros_like(in_range, dtype=float)
         np.divide(
-            self._cfg.d_max - distances_from_predators,
-            self._cfg.d_max * distances_from_predators,
+            self._cfg.u4_dmax - distances_from_predators,
+            self._cfg.u4_dmax * distances_from_predators,
             where=in_range,
             out=weights,
         )

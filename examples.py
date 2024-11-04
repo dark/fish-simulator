@@ -60,6 +60,7 @@ class TwoDimensionsGrid:
             u2_p=3.0,
             u2_dopt=1.0,
             u4_p=5.0,
+            u4_dmax=3.0,
             uw=r.gen_random_matrix(
                 (self.FISHES_BY_DIM**self.SPACE_DIMENSIONS, 4),
                 min_value=0.9,
