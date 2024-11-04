@@ -150,19 +150,37 @@ class Engine:
         return u1_vector * self._cfg.u1_p * self._cfg.uw[:, 0].reshape((-1, 1))
 
     def _calculate_urgency2(self, distances):
-        """
-        Avoids each particle from getting too close to other particles.
+        """Avoids each particle from getting too close to other particles.
+
+        The strenght of this urgency is:
+
+        * when distance < u2_dopt: u2_p * (u2_dopt - distance) / u2_dopt
+        *               otherwise: 0
+
+        This means that the urgency is equal to `u2_p` if
+        `distance=0`, then it linearly decreases as distance
+        decreases, reaching `u2_p=0` when `distance=u2_dopt.`
         """
         # Select all particles that, for this component, have an
         # effect on one another.
         in_range = np.logical_and(distances > 0, distances <= self._cfg.u2_dopt)
         # Generate weights for how much each particle affects another.
         weights = np.zeros_like(in_range, dtype=float)
-        # The weight formula is:
+
+        # The weight modulates how strongly two particles repel one
+        # another based on distance, and is equal to the following
+        # component of the urgency:
         #
-        # weight = desired_length / initial_length
-        #        = ((_cfg.u2_dopt - initial_length)/_cfg.u2_dopt) / initial_length
-        #        = (_cfg.u2_dopt - initial_length) / (_cfg.u2_dopt * initial_length)
+        # (u2_dopt - distance) / u2_dopt
+        #
+        # Distance vectors are in the right direction, however they
+        # are not unit vectors. For example, two particles that are
+        # `u2_dopt` distant generate a vector that is `u2_dopt`
+        # long. Hence, we need to normalize each vector to a unit
+        # vector by dividing it by its length. Because of this, the
+        # final weight formula is:
+        #
+        # (u2_dopt - distance) / (u2_dopt * distance)
         np.divide(
             self._cfg.u2_dopt - distances,
             self._cfg.u2_dopt * distances,
