@@ -169,8 +169,14 @@ class BaseTwoDimensionialScene(Scene):
         predator_histories = Utils.repack_predator_histories_for_manim(state_histories)
 
         # Set up a set of x,y axes.
-        x_axes_minmax = (-5.0, 5.0)  # stub
-        y_axes_minmax = (-5.0, 5.0)  # stub
+        x_axes_minmax = (
+            min([min(p[:, 0]) for p in point_histories]),
+            max([max(p[:, 0]) for p in point_histories]),
+        )
+        y_axes_minmax = (
+            min([min(p[:, 1]) for p in point_histories]),
+            max([max(p[:, 1]) for p in point_histories]),
+        )
         axes = _generate_dynamic_2d_axes(x_axes_minmax, y_axes_minmax)
         self.add(axes)
 
