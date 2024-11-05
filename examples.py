@@ -33,19 +33,23 @@ def cartesian(array, dimensions):
 
 class TwoDimensionsGrid:
 
-    SPACE_DIMENSIONS = 2
-    FISHES_BY_DIM = 11
+    _SPACE_DIMENSIONS = 2
+    _PARTICLES_BY_DIM = 11
 
     def _create_initial_state(self):
         # Cast to int necessary to make initial spacing nicer in this
         # sample configuration.
         one_dim = np.arange(
-            -(self.FISHES_BY_DIM / 2), self.FISHES_BY_DIM / 2, dtype=int
+            -(self._PARTICLES_BY_DIM / 2), self._PARTICLES_BY_DIM / 2, dtype=int
         )
         # Re-casting to float because that's what all matrices use.
-        p = cartesian(one_dim, self.SPACE_DIMENSIONS).astype(float)
-        v = np.zeros((self.FISHES_BY_DIM**self.SPACE_DIMENSIONS, self.SPACE_DIMENSIONS))
-        a = np.zeros((self.FISHES_BY_DIM**self.SPACE_DIMENSIONS, self.SPACE_DIMENSIONS))
+        p = cartesian(one_dim, self._SPACE_DIMENSIONS).astype(float)
+        v = np.zeros(
+            (self._PARTICLES_BY_DIM**self._SPACE_DIMENSIONS, self._SPACE_DIMENSIONS)
+        )
+        a = np.zeros(
+            (self._PARTICLES_BY_DIM**self._SPACE_DIMENSIONS, self._SPACE_DIMENSIONS)
+        )
         return p, v, a
 
     def _create_config(self):
@@ -62,7 +66,7 @@ class TwoDimensionsGrid:
             u4_p=10.0,
             u4_dmax=3.0,
             uw=r.gen_random_matrix(
-                (self.FISHES_BY_DIM**self.SPACE_DIMENSIONS, 4),
+                (self._PARTICLES_BY_DIM**self._SPACE_DIMENSIONS, 4),
                 min_value=0.9,
                 max_value=1.0,
             ),
@@ -75,9 +79,9 @@ class TwoDimensionsGrid:
             v,
             a,
             # This example has no predators.
-            pred_p=np.zeros((0, self.SPACE_DIMENSIONS)),
-            pred_v=np.zeros((0, self.SPACE_DIMENSIONS)),
-            pred_a=np.zeros((0, self.SPACE_DIMENSIONS)),
+            pred_p=np.zeros((0, self._SPACE_DIMENSIONS)),
+            pred_v=np.zeros((0, self._SPACE_DIMENSIONS)),
+            pred_a=np.zeros((0, self._SPACE_DIMENSIONS)),
         )
         cfg = self._create_config()
         engine = Engine(s, cfg)
