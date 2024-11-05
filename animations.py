@@ -83,9 +83,10 @@ def _generate_dynamic_2d_axes(
     print("Using x axis range: {}".format(x_range))
     print("Using y axis range: {}".format(y_range))
 
-    # These are computed to maintain the ratio obtained at the top.
-    x_length = viewport_length_x * 20 / 19.0
-    y_length = viewport_length_y  # *10/10.0 cancel out
+    # These are constant to maintain the ratio obtained at the top,
+    # and still keep the entire viewport visible.
+    x_length = 20
+    y_length = 10
     print("Using lengths: x={} y={}".format(x_length, y_length))
 
     return Axes(
