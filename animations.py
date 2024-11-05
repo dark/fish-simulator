@@ -21,6 +21,27 @@ from manim import *
 from utils import Utils
 
 
+def generate_dynamic_2d_axes():
+    # Somehow the ratio obtained when starting with:
+    #
+    #   x=[-14,14], y=[-7, 7], x_length=20, y_length=10
+    #
+    # is aesthetically pleasing and generates square units, even
+    # though the viewport really displays only x=[-10, 10], y=[-5, 5].
+    #
+    # The key to keep a proper square ratio is to keep
+    # x.range/x.length == y.range/y.length.
+    axes = Axes(
+        x_range=(-14, 14, 1),
+        y_range=(-7, 7, 1),
+        tips=False,
+        x_length=20,
+        y_length=10,
+        # axis_config={"include_numbers": True},
+    )
+    return axes
+
+
 class SecondsCounter(Animation):
     def __init__(self, number: DecimalNumber, **kwargs) -> None:
         # Pass number as the mobject of the animation
@@ -73,18 +94,6 @@ class BaseTwoDimensionialScene(Scene):
                 "_run_time should be defined in the derived scene before construction"
             )
 
-        # Set up a set of x,y axes. The key to keep a proper square
-        # ratio is to keep x.range/x.length == y.range/y.length.
-        axes = Axes(
-            x_range=(-14, 14, 1),
-            y_range=(-7, 7, 1),
-            tips=False,
-            x_length=20,
-            y_length=10,
-            # axis_config={ "include_numbers": True},
-        )
-        self.add(axes)
-
         # Setup editable parameters
         run_time = self._run_time  # in seconds
         # We want to display the position of each particle, with a
@@ -102,6 +111,10 @@ class BaseTwoDimensionialScene(Scene):
         )
         point_histories = Utils.repack_particle_histories_for_manim(state_histories)
         predator_histories = Utils.repack_predator_histories_for_manim(state_histories)
+
+        # Set up a set of x,y axes.
+        axes = generate_dynamic_2d_axes()
+        self.add(axes)
 
         # Create an animation that will move a dot along the imaginary
         # path that each particle follows. We do not explicitly create
