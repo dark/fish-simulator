@@ -83,6 +83,7 @@ class Engine:
 
     def run(self, *, timestep: float, iterations: int) -> List[State]:
         """Run the simulation, return a snapshot of all states."""
+        print("Starting simulation ...")
         states = [copy.deepcopy(self._state)]
         for iteration in range(iterations):
             if iteration % 10 == 9:
