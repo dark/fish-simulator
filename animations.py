@@ -19,27 +19,83 @@
 
 from manim import *
 from utils import Utils
+from typing import Tuple
 
 
-def generate_dynamic_2d_axes():
+def _generate_2d_axis_range(
+    minmax: Tuple[float, float], length: float, buffer_factor: float
+):
+    midpoint = (minmax[1] + minmax[0]) / 2
+    return (
+        midpoint - length * buffer_factor / 2,
+        midpoint + length * buffer_factor / 2,
+        1,
+    )
+
+
+def _generate_dynamic_2d_axes(
+    x_axes_minmax: Tuple[float, float], y_axes_minmax: Tuple[float, float]
+):
+    """Generates a dynamic set of axes.
+
+    This takes into consideration the min/max values the points to be
+    displayed have on either axis.
+
+    """
+
     # Somehow the ratio obtained when starting with:
     #
     #   x=[-14,14], y=[-7, 7], x_length=20, y_length=10
     #
     # is aesthetically pleasing and generates square units, even
-    # though the viewport really displays only x=[-10, 10], y=[-5, 5].
+    # though the viewport really displays only x=[-9.5, 9.5], y=[-5, 5].
     #
-    # The key to keep a proper square ratio is to keep
+    # Also, the key to keep a proper square ratio is to keep
     # x.range/x.length == y.range/y.length.
-    axes = Axes(
-        x_range=(-14, 14, 1),
-        y_range=(-7, 7, 1),
+
+    # The minimum length of 19 corresponds to the x=[-9.5, 9.5] viewport.
+    smallest_viewport_length_x = max(x_axes_minmax[1] - x_axes_minmax[0], 19.0)
+    # The minimum length of 10 corresponds to the y=[-5, 5] viewport.
+    smallest_viewport_length_y = max(y_axes_minmax[1] - y_axes_minmax[0], 10.0)
+
+    # Check which viewport needs to widen to maintain the pleasing
+    # ratio mentioned above.
+    if smallest_viewport_length_x / smallest_viewport_length_y < 1.9:
+        # Stretch the x length to match
+        viewport_length_x = smallest_viewport_length_y * 1.9
+        viewport_length_y = smallest_viewport_length_y
+    else:
+        # Stretch the y length to match
+        viewport_length_x = smallest_viewport_length_x
+        viewport_length_y = smallest_viewport_length_x / 1.9
+
+    print(
+        "Using dynamic viewport with ratio x:y={}:{}".format(
+            viewport_length_x, viewport_length_y
+        )
+    )
+    # The buffer factor would give a range of x=[-14, 14] for viewport
+    # x=[-9.5, 9.5].
+    x_range = _generate_2d_axis_range(x_axes_minmax, viewport_length_x, 28.0 / 19.0)
+    # The buffer factor would give a range of y=[-7, 7] for viewport
+    # y=[-5, 5].
+    y_range = _generate_2d_axis_range(y_axes_minmax, viewport_length_y, 14.0 / 10.0)
+    print("Using x axis range: {}".format(x_range))
+    print("Using y axis range: {}".format(y_range))
+
+    # These are computed to maintain the ratio obtained at the top.
+    x_length = viewport_length_x * 20 / 19.0
+    y_length = viewport_length_y  # *10/10.0 cancel out
+    print("Using lengths: x={} y={}".format(x_length, y_length))
+
+    return Axes(
+        x_range=x_range,
+        y_range=y_range,
         tips=False,
-        x_length=20,
-        y_length=10,
+        x_length=x_length,
+        y_length=y_length,
         # axis_config={"include_numbers": True},
     )
-    return axes
 
 
 class SecondsCounter(Animation):
@@ -113,7 +169,9 @@ class BaseTwoDimensionialScene(Scene):
         predator_histories = Utils.repack_predator_histories_for_manim(state_histories)
 
         # Set up a set of x,y axes.
-        axes = generate_dynamic_2d_axes()
+        x_axes_minmax = (-5.0, 5.0)  # stub
+        y_axes_minmax = (-5.0, 5.0)  # stub
+        axes = _generate_dynamic_2d_axes(x_axes_minmax, y_axes_minmax)
         self.add(axes)
 
         # Create an animation that will move a dot along the imaginary
