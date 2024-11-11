@@ -202,7 +202,9 @@ class BaseTwoDimensionialScene(Scene):
         state_histories = self._config_to_render.run(
             timestep=timestep, iterations=iterations
         )
-        p_histories, _, _ = Utils.repack_particle_histories_for_manim(state_histories)
+        p_histories, _, a_histories = Utils.repack_particle_histories_for_manim(
+            state_histories
+        )
         predator_histories = Utils.repack_predator_histories_for_manim(state_histories)
 
         # Set up a set of x,y axes.
@@ -225,18 +227,21 @@ class BaseTwoDimensionialScene(Scene):
         # go to directly in the animation.
         #
         # This requires that the size of the history of each point
-        # (i.e. len(points_histories[x]], for each x) is equal to the
+        # (i.e. len(p_histories[x]], for each x) is equal to the
         # number for frames we want to generate + 1 (i.e. indices are
         # in the range `[0, iterations]`).
-        dot_animations = []
+        animations = []
 
         # Animate all particles
         colors = color_gradient([BLUE_E, BLUE_A], len(p_histories))
-        for points, color in zip(p_histories, colors):
+        for p_points, a_points, color in zip(p_histories, a_histories, colors):
+            # Convert the position points to the frame of reference
+            # defined by the axes.
+            axes_p_points = axes.c2p(*p_points.T).T
+
             dot = Dot(color=color, radius=0.03)
-            points = axes.c2p(*points.T).T
-            dot_animation = MoveAlongPoints(dot, points, run_time=run_time)
-            dot_animations.append(dot_animation)
+            dot_animation = MoveAlongPoints(dot, axes_p_points, run_time=run_time)
+            animations.append(dot_animation)
 
             trail = TracedPath(
                 dot.get_center,
@@ -246,6 +251,26 @@ class BaseTwoDimensionialScene(Scene):
             )
             self.add(dot, trail)
 
+            # For the purpose of drawing acceleration vectors, the
+            # starting points are the Dot positions, while the end
+            # points are where the acceleration vector ends, when
+            # added.
+            a_ends = a_points + p_points
+            axes_a_ends = axes.c2p(*a_ends.T).T
+
+            line = Line(
+                stroke_width=1,
+                buff=0,
+                color=color,
+                start=axes_p_points[0],
+                end=axes_a_ends[0],
+            )
+            line_animation = MoveLineBetweenPoints(
+                line, axes_p_points, axes_a_ends, run_time=run_time
+            )
+            animations.append(line_animation)
+            self.add(line)
+
         # Animate all predators, if there are any
         if predator_histories:
             predator_colors = color_gradient([RED_E, RED_A], len(predator_histories))
@@ -253,7 +278,7 @@ class BaseTwoDimensionialScene(Scene):
                 dot = Dot(color=color, radius=0.05)
                 points = axes.c2p(*predator_points.T).T
                 dot_animation = MoveAlongPoints(dot, points, run_time=run_time)
-                dot_animations.append(dot_animation)
+                animations.append(dot_animation)
 
                 trail = TracedPath(
                     dot.get_center,
@@ -278,6 +303,6 @@ class BaseTwoDimensionialScene(Scene):
         self.add(seconds_text, seconds_number)
 
         self.play(
-            *dot_animations,
+            *animations,
             SecondsCounter(seconds_number),
         )
