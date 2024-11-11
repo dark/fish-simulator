@@ -177,6 +177,14 @@ class BaseTwoDimensionialScene(Scene):
         self._config_to_render = ...
         self._run_time = ...  # in seconds
 
+        # Init optional parameters with their default values.
+
+        # Which particles will be used as exemplars.
+        self._exemplar_indices = {}
+        # How much the value displayed for each exemplar will be
+        # rescaled. Useful to display smaller-scale values.
+        self._exemplar_amplification = 1.0
+
     def construct(self):
         if self._config_to_render is Ellipsis:
             raise ValueError(
@@ -234,7 +242,9 @@ class BaseTwoDimensionialScene(Scene):
 
         # Animate all particles
         colors = color_gradient([BLUE_E, BLUE_A], len(p_histories))
-        for p_points, a_points, color in zip(p_histories, a_histories, colors):
+        for idx, p_points, a_points, color in zip(
+            range(len(p_histories)), p_histories, a_histories, colors, strict=True
+        ):
             # Convert the position points to the frame of reference
             # defined by the axes.
             axes_p_points = axes.c2p(*p_points.T).T
@@ -255,21 +265,22 @@ class BaseTwoDimensionialScene(Scene):
             # starting points are the Dot positions, while the end
             # points are where the acceleration vector ends, when
             # added.
-            a_ends = a_points + p_points
-            axes_a_ends = axes.c2p(*a_ends.T).T
+            if idx in self._exemplar_indices:
+                a_ends = a_points * self._exemplar_amplification + p_points
+                axes_a_ends = axes.c2p(*a_ends.T).T
 
-            line = Line(
-                stroke_width=1,
-                buff=0,
-                color=color,
-                start=axes_p_points[0],
-                end=axes_a_ends[0],
-            )
-            line_animation = MoveLineBetweenPoints(
-                line, axes_p_points, axes_a_ends, run_time=run_time
-            )
-            animations.append(line_animation)
-            self.add(line)
+                line = Line(
+                    stroke_width=1,
+                    buff=0,
+                    color=color,
+                    start=axes_p_points[0],
+                    end=axes_a_ends[0],
+                )
+                line_animation = MoveLineBetweenPoints(
+                    line, axes_p_points, axes_a_ends, run_time=run_time
+                )
+                animations.append(line_animation)
+                self.add(line)
 
         # Animate all predators, if there are any
         if predator_histories:

@@ -27,6 +27,7 @@ class TwoDimensionsGridDisplay(BaseTwoDimensionialScene):
         super().setup()
         self._config_to_render = TwoDimensionsGrid()
         self._run_time = 30
+        self._exemplar_indices = {0, 10, 110, 120}
 
     def construct(self):
         super().construct()
