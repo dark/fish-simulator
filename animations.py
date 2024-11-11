@@ -286,9 +286,10 @@ class BaseTwoDimensionialScene(Scene):
         if predator_histories:
             predator_colors = color_gradient([RED_E, RED_A], len(predator_histories))
             for predator_points, color in zip(predator_histories, predator_colors):
+                axes_p_points = axes.c2p(*predator_points.T).T
+
                 dot = Dot(color=color, radius=0.05)
-                points = axes.c2p(*predator_points.T).T
-                dot_animation = MoveAlongPoints(dot, points, run_time=run_time)
+                dot_animation = MoveAlongPoints(dot, axes_p_points, run_time=run_time)
                 animations.append(dot_animation)
 
                 trail = TracedPath(
