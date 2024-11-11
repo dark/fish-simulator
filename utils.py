@@ -18,7 +18,7 @@
 #
 
 import numpy as np
-from typing import List
+from typing import List, Tuple
 
 
 class Utils:
@@ -32,7 +32,9 @@ class Utils:
 
     def repack_particle_histories_for_manim(
         state_history: "List[State]",
-    ) -> List[np.typing.NDArray]:
+    ) -> Tuple[
+        List[np.typing.NDArray], List[np.typing.NDArray], List[np.typing.NDArray]
+    ]:
         """Repacks a list of particle state histories to be used by Manim.
 
         Engine operations return a list of entries, where each entry
@@ -41,15 +43,20 @@ class Utils:
         positions that a specific particle went through in the
         simulation.
 
-        This method converts from the former to the latter format.
+        This method converts from the former to the latter format,
+        returning the position, velocity and acceleration vectors
+        separately.
 
         """
-        particle_histories = []
+        p_histories = []
+        v_histories = []
+        a_histories = []
         number_of_particles = len(state_history[0].p)
         for idx in range(0, number_of_particles):
-            array = np.array([s.p[idx] for s in state_history])
-            particle_histories.append(array)
-        return particle_histories
+            p_histories.append(np.array([s.p[idx] for s in state_history]))
+            v_histories.append(np.array([s.v[idx] for s in state_history]))
+            a_histories.append(np.array([s.a[idx] for s in state_history]))
+        return p_histories, v_histories, a_histories
 
     def repack_predator_histories_for_manim(
         state_history: "List[State]",

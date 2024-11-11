@@ -166,17 +166,17 @@ class BaseTwoDimensionialScene(Scene):
         state_histories = self._config_to_render.run(
             timestep=timestep, iterations=iterations
         )
-        point_histories = Utils.repack_particle_histories_for_manim(state_histories)
+        p_histories, _, _ = Utils.repack_particle_histories_for_manim(state_histories)
         predator_histories = Utils.repack_predator_histories_for_manim(state_histories)
 
         # Set up a set of x,y axes.
         x_axes_minmax = (
-            min([min(p[:, 0]) for p in point_histories]),
-            max([max(p[:, 0]) for p in point_histories]),
+            min([min(p[:, 0]) for p in p_histories]),
+            max([max(p[:, 0]) for p in p_histories]),
         )
         y_axes_minmax = (
-            min([min(p[:, 1]) for p in point_histories]),
-            max([max(p[:, 1]) for p in point_histories]),
+            min([min(p[:, 1]) for p in p_histories]),
+            max([max(p[:, 1]) for p in p_histories]),
         )
         axes = _generate_dynamic_2d_axes(x_axes_minmax, y_axes_minmax)
         self.add(axes)
@@ -195,8 +195,8 @@ class BaseTwoDimensionialScene(Scene):
         dot_animations = []
 
         # Animate all particles
-        colors = color_gradient([BLUE_E, BLUE_A], len(point_histories))
-        for points, color in zip(point_histories, colors):
+        colors = color_gradient([BLUE_E, BLUE_A], len(p_histories))
+        for points, color in zip(p_histories, colors):
             dot = Dot(color=color, radius=0.03)
             points = axes.c2p(*points.T).T
             dot_animation = MoveAlongPoints(dot, points, run_time=run_time)
