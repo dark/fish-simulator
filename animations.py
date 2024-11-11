@@ -133,6 +133,42 @@ class MoveAlongPoints(Animation):
         self.mobject.move_to(self._points[round(alpha * self._last_index)])
 
 
+class MoveLineBetweenPoints(Animation):
+    """
+    Move a Line object (or any derived class) between the points provided.
+    """
+
+    def __init__(
+        self,
+        mobject: Line,
+        start_points: np.typing.NDArray,
+        end_points: np.typing.NDArray,
+        **kwargs,
+    ) -> None:
+        self._start_points = start_points
+        self._end_points = end_points
+        self._last_index = len(start_points) - 1
+        if len(start_points) != len(end_points):
+            raise ValueError(
+                "Inconsistent array lengths: {} and {}".format(
+                    len(start_points), len(end_points)
+                )
+            )
+
+        # Pass provided mobject as the mobject of the animation
+        super().__init__(mobject, **kwargs)
+
+    def interpolate_mobject(self, alpha: float) -> None:
+        # The goal is to return the point from `self._start_points` at
+        # the right index in `[0, last_index]` based on
+        # `alpha*len(points)`. Same for `self._end_points`.
+        #
+        # Due to floating point math, rounding is expected.
+        start = self._start_points[round(alpha * self._last_index)]
+        end = self._end_points[round(alpha * self._last_index)]
+        self.mobject.put_start_and_end_on(start, end)
+
+
 class BaseTwoDimensionialScene(Scene):
     def setup(self):
         # Init editable parameters, so that we can check for them
