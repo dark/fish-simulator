@@ -7,3 +7,7 @@ mathematical notations, `numpy`/`scipy` and `manim`.
 <p align="center">
   <img src="img/example.gif" />
 </p>
+
+<p align="center">
+  <img src="img/example-predator.gif" />
+</p>
