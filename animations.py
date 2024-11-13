@@ -100,13 +100,15 @@ def _generate_dynamic_2d_axes(
 
 
 class SecondsCounter(Animation):
-    def __init__(self, number: DecimalNumber, **kwargs) -> None:
+    def __init__(self, number: DecimalNumber, begin: int, end: int, **kwargs) -> None:
+        self._begin = begin
+        self._end = end
         # Pass number as the mobject of the animation
         super().__init__(number, **kwargs)
 
     def interpolate_mobject(self, alpha: float) -> None:
         # Set value of DecimalNumber according to alpha
-        self.mobject.set_value(alpha)
+        self.mobject.set_value(self._begin + alpha * (self._end - self._begin))
 
 
 class MoveAlongPoints(Animation):
@@ -316,5 +318,5 @@ class BaseTwoDimensionialScene(Scene):
 
         self.play(
             *animations,
-            SecondsCounter(seconds_number),
+            SecondsCounter(seconds_number, begin=0, end=run_time, run_time=run_time),
         )
