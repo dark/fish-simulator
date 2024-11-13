@@ -190,6 +190,11 @@ class BaseTwoDimensionialScene(Scene):
         # How much the value displayed for each exemplar will be
         # rescaled. Useful to display smaller-scale values.
         self._exemplar_amplification = 1.0
+        # Whether the runtime counter at the top left of the animation
+        # should include the time portion of the simulation that was
+        # simulated, but not rendered. If False, the counter will
+        # always start at zero.
+        self._runtime_counter_includes_prelude = False
 
     def construct(self):
         if self._config_to_render is Ellipsis:
@@ -342,8 +347,16 @@ class BaseTwoDimensionialScene(Scene):
             *animations,
             SecondsCounter(
                 seconds_number,
-                begin=self._do_not_render_initial_seconds,
-                end=total_run_time,
+                begin=(
+                    self._do_not_render_initial_seconds
+                    if self._runtime_counter_includes_prelude
+                    else 0
+                ),
+                end=(
+                    total_run_time
+                    if self._runtime_counter_includes_prelude
+                    else render_run_time
+                ),
                 run_time=render_run_time,
             ),
         )
