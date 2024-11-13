@@ -81,16 +81,30 @@ class Engine:
                 )
             )
 
-    def run(self, *, timestep: float, iterations: int) -> List[State]:
+    def run(
+        self, *, timestep: float, iterations: int, skip_initial_states: int = 0
+    ) -> List[State]:
         """Run the simulation, return a snapshot of all states."""
-        print("Starting simulation ...")
-        states = [copy.deepcopy(self._state)]
-        for iteration in range(iterations):
-            if iteration % 10 == 9:
-                print("Simulating iteration {}/{}".format(iteration + 1, iterations))
+        print("Starting simulation with {} iterations ...".format(iterations))
+        if skip_initial_states > 0:
+            print(
+                "(the first {} iterations will be simulated but not returned into the state vector)".format(
+                    skip_initial_states
+                )
+            )
+        else:
+            states = [copy.deepcopy(self._state)]
+
+        for iteration in range(1, iterations + 1):
+            if iteration % 10 == 0:
+                print("Simulating iteration {}/{}".format(iteration, iterations))
             self._step_particles(timestep)
             self._step_predators(timestep)
-            states.append(copy.deepcopy(self._state))
+            if iteration > (skip_initial_states - 1):
+                # The math works so that skip_initial_states=i will
+                # skip the initial state and the (i-1) states after
+                # that (hence the -1).
+                states.append(copy.deepcopy(self._state))
         return states
 
     def _step_particles(self, timestep: float):

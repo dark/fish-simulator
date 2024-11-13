@@ -177,10 +177,14 @@ class BaseTwoDimensionialScene(Scene):
         # later in construct(). These should be defined in the derived
         # scene.
         self._config_to_render = ...
-        self._run_time = ...  # in seconds
+        # Overall simulation runtime, in seconds
+        self._run_time = ...
 
         # Init optional parameters with their default values.
 
+        # The time, in seconds, that will be simulated, but not
+        # rendered, at the beginning of the simulation.
+        self._do_not_render_initial_seconds = 0
         # Which particles will be used as exemplars.
         self._exemplar_indices = {}
         # How much the value displayed for each exemplar will be
@@ -196,9 +200,18 @@ class BaseTwoDimensionialScene(Scene):
             raise ValueError(
                 "_run_time should be defined in the derived scene before construction"
             )
+        if self._do_not_render_initial_seconds > self._run_time:
+            raise ValueError(
+                "_do_not_render_initial_seconds cannot be larger than _run_time: {} > {}".format(
+                    self._do_not_render_initial_seconds, self._run_time
+                )
+            )
 
         # Setup editable parameters
-        run_time = self._run_time  # in seconds
+        total_run_time = self._run_time  # in seconds
+        render_run_time = (
+            self._run_time - self._do_not_render_initial_seconds
+        )  # in seconds
         # We want to display the position of each particle, with a
         # small "trail" behind it. Duration of the trail, in seconds.
         trail_duration = 0.25
@@ -206,11 +219,24 @@ class BaseTwoDimensionialScene(Scene):
         # Determine other configuration options.
         fps = config.frame_rate
         timestep = 1 / fps
-        iterations = (int)(fps * run_time)
+        iterations = (int)(fps * total_run_time)
+        skip_initial_iterations = (int)(fps * self._do_not_render_initial_seconds)
+        print(
+            "Configuration: fps={} timestep={}, total(runtime,iterations)={},{} render(runtime,iterations)={},{}".format(
+                fps,
+                timestep,
+                total_run_time,
+                iterations,
+                render_run_time,
+                iterations - skip_initial_iterations,
+            )
+        )
 
         # Run the engine to compute all position states.
         state_histories = self._config_to_render.run(
-            timestep=timestep, iterations=iterations
+            timestep=timestep,
+            iterations=iterations,
+            skip_initial_states=skip_initial_iterations,
         )
         p_histories, _, a_histories = Utils.repack_particle_histories_for_manim(
             state_histories
@@ -252,7 +278,9 @@ class BaseTwoDimensionialScene(Scene):
             axes_p_points = axes.c2p(*p_points.T).T
 
             dot = Dot(color=color, radius=0.03)
-            dot_animation = MoveAlongPoints(dot, axes_p_points, run_time=run_time)
+            dot_animation = MoveAlongPoints(
+                dot, axes_p_points, run_time=render_run_time
+            )
             animations.append(dot_animation)
 
             trail = TracedPath(
@@ -279,7 +307,7 @@ class BaseTwoDimensionialScene(Scene):
                     end=axes_a_ends[0],
                 )
                 line_animation = MoveLineBetweenPoints(
-                    line, axes_p_points, axes_a_ends, run_time=run_time
+                    line, axes_p_points, axes_a_ends, run_time=render_run_time
                 )
                 animations.append(line_animation)
                 self.add(line)
@@ -291,7 +319,9 @@ class BaseTwoDimensionialScene(Scene):
                 axes_p_points = axes.c2p(*predator_points.T).T
 
                 dot = Dot(color=color, radius=0.05)
-                dot_animation = MoveAlongPoints(dot, axes_p_points, run_time=run_time)
+                dot_animation = MoveAlongPoints(
+                    dot, axes_p_points, run_time=render_run_time
+                )
                 animations.append(dot_animation)
 
                 trail = TracedPath(
@@ -318,5 +348,10 @@ class BaseTwoDimensionialScene(Scene):
 
         self.play(
             *animations,
-            SecondsCounter(seconds_number, begin=0, end=run_time, run_time=run_time),
+            SecondsCounter(
+                seconds_number,
+                begin=self._do_not_render_initial_seconds,
+                end=total_run_time,
+                run_time=render_run_time,
+            ),
         )
