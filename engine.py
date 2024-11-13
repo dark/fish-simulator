@@ -92,6 +92,7 @@ class Engine:
                     skip_initial_states
                 )
             )
+            states = []
         else:
             states = [copy.deepcopy(self._state)]
 
