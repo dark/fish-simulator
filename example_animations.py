@@ -26,7 +26,7 @@ class TwoDimensionsGridDisplay(BaseTwoDimensionialScene):
     def setup(self):
         super().setup()
         self._config_to_render = TwoDimensionsGrid()
-        self._run_time = 30
+        self._render_run_time = 30
         self._do_not_render_initial_seconds = 0
         self._exemplar_indices = {0, 10, 110, 120}
 
@@ -38,7 +38,7 @@ class TwoDimensionsGridWithPredatorDisplay(BaseTwoDimensionialScene):
     def setup(self):
         super().setup()
         self._config_to_render = TwoDimensionsGridWithPredator()
-        self._run_time = 30
+        self._render_run_time = 30
         self._do_not_render_initial_seconds = 0
         self._exemplar_indices = {0, 10, 110, 120}
 

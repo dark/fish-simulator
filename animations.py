@@ -177,8 +177,8 @@ class BaseTwoDimensionialScene(Scene):
         # later in construct(). These should be defined in the derived
         # scene.
         self._config_to_render = ...
-        # Overall simulation runtime, in seconds
-        self._run_time = ...
+        # Render runtime, in seconds.
+        self._render_run_time = ...
 
         # Init optional parameters with their default values.
 
@@ -196,22 +196,14 @@ class BaseTwoDimensionialScene(Scene):
             raise ValueError(
                 "_config_to_render should be defined in the derived scene before construction"
             )
-        if self._run_time is Ellipsis:
+        if self._render_run_time is Ellipsis:
             raise ValueError(
-                "_run_time should be defined in the derived scene before construction"
-            )
-        if self._do_not_render_initial_seconds > self._run_time:
-            raise ValueError(
-                "_do_not_render_initial_seconds cannot be larger than _run_time: {} > {}".format(
-                    self._do_not_render_initial_seconds, self._run_time
-                )
+                "_render_run_time should be defined in the derived scene before construction"
             )
 
         # Setup editable parameters
-        total_run_time = self._run_time  # in seconds
-        render_run_time = (
-            self._run_time - self._do_not_render_initial_seconds
-        )  # in seconds
+        total_run_time = self._render_run_time + self._do_not_render_initial_seconds
+        render_run_time = self._render_run_time
         # We want to display the position of each particle, with a
         # small "trail" behind it. Duration of the trail, in seconds.
         trail_duration = 0.25
