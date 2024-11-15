@@ -17,6 +17,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import enum
 from manim import *
 from utils import Utils
 from typing import Tuple
@@ -172,6 +173,11 @@ class MoveLineBetweenPoints(Animation):
 
 
 class BaseTwoDimensionialScene(Scene):
+    class ExemplarInfo(enum.Enum):
+        NONE = 0
+        ACCELERATION = 1
+        URGENCIES = 2
+
     def setup(self):
         # Init editable parameters, so that we can check for them
         # later in construct(). These should be defined in the derived
@@ -185,16 +191,18 @@ class BaseTwoDimensionialScene(Scene):
         # The time, in seconds, that will be simulated, but not
         # rendered, at the beginning of the simulation.
         self._do_not_render_initial_seconds = 0
-        # Which particles will be used as exemplars.
-        self._exemplar_indices = {}
-        # How much the value displayed for each exemplar will be
-        # rescaled. Useful to display smaller-scale values.
-        self._exemplar_amplification = 1.0
         # Whether the runtime counter at the top left of the animation
         # should include the time portion of the simulation that was
         # simulated, but not rendered. If False, the counter will
         # always start at zero.
         self._runtime_counter_includes_prelude = False
+        # Which particles will be used as exemplars.
+        self._exemplar_indices = {}
+        # What information will be displayed for exemplars.
+        self._exemplar_info = self.ExemplarInfo.NONE
+        # How much the value displayed for each exemplar will be
+        # rescaled. Useful to display smaller-scale values.
+        self._exemplar_amplification = 1.0
 
     def construct(self):
         if self._config_to_render is Ellipsis:
@@ -288,26 +296,29 @@ class BaseTwoDimensionialScene(Scene):
             )
             self.add(dot, trail)
 
-            # For the purpose of drawing acceleration vectors, the
-            # starting points are the Dot positions, while the end
-            # points are where the acceleration vector ends, when
-            # added.
             if idx in self._exemplar_indices:
-                a_ends = a_points * self._exemplar_amplification + p_points
-                axes_a_ends = axes.c2p(*a_ends.T).T
+                if self._exemplar_info == self.ExemplarInfo.ACCELERATION:
+                    # For the purpose of drawing acceleration vectors,
+                    # the starting points are the Dot positions, while
+                    # the end points are where the acceleration vector
+                    # ends, when added.
+                    a_ends = a_points * self._exemplar_amplification + p_points
+                    axes_a_ends = axes.c2p(*a_ends.T).T
 
-                line = Line(
-                    stroke_width=1,
-                    buff=0,
-                    color=color,
-                    start=axes_p_points[0],
-                    end=axes_a_ends[0],
-                )
-                line_animation = MoveLineBetweenPoints(
-                    line, axes_p_points, axes_a_ends, run_time=render_run_time
-                )
-                animations.append(line_animation)
-                self.add(line)
+                    line = Line(
+                        stroke_width=1,
+                        buff=0,
+                        color=color,
+                        start=axes_p_points[0],
+                        end=axes_a_ends[0],
+                    )
+                    line_animation = MoveLineBetweenPoints(
+                        line, axes_p_points, axes_a_ends, run_time=render_run_time
+                    )
+                    animations.append(line_animation)
+                    self.add(line)
+                elif self._exemplar_info == self.ExemplarInfo.URGENCIES:
+                    pass
 
         # Animate all predators, if there are any
         if predator_histories:

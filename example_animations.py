@@ -29,6 +29,7 @@ class TwoDimensionsGridDisplay(BaseTwoDimensionialScene):
         self._render_run_time = 30
         self._do_not_render_initial_seconds = 0
         self._exemplar_indices = {0, 10, 110, 120}
+        self._exemplar_info = self.ExemplarInfo.ACCELERATION
 
     def construct(self):
         super().construct()
@@ -41,6 +42,7 @@ class TwoDimensionsGridWithPredatorDisplay(BaseTwoDimensionialScene):
         self._render_run_time = 30
         self._do_not_render_initial_seconds = 0
         self._exemplar_indices = {0, 10, 110, 120}
+        self._exemplar_info = self.ExemplarInfo.ACCELERATION
 
     def construct(self):
         super().construct()
