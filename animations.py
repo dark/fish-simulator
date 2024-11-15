@@ -328,7 +328,7 @@ class BaseTwoDimensionialScene(Scene):
                         )
                     )
                     urgencies_count = urgencies.shape[0]
-                    urgency_colors = [YELLOW, BLUE, RED]
+                    urgency_colors = [YELLOW, PURPLE, RED]
                     for urgency_idx, urgency_color in zip(
                         range(urgencies_count), urgency_colors, strict=True
                     ):
