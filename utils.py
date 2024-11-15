@@ -58,6 +58,31 @@ class Utils:
             a_histories.append(np.array([s.a[idx] for s in state_history]))
         return p_histories, v_histories, a_histories
 
+    def repack_one_particle_urgencies_for_manim(
+        idx: int, urgencies_histories: List[np.typing.NDArray]
+    ) -> np.typing.NDArray:
+        """Repacks a list of urgency histories to be used by Manim.
+
+        Engine operations return a list of entries, where each entry
+        is the state of the urgencies at each iteration, with shape
+        (urgencies_count, particles_count, dimensions_count).
+
+        This method extract the urgencies for a specific particle,
+        returning them in an array with shape
+        (urgencies_count, iterations_count, dimensions_count).
+
+        """
+        result = np.zeros(
+            (
+                urgencies_histories[0].shape[0],
+                len(urgencies_histories),
+                urgencies_histories[0].shape[2],
+            )
+        )
+        for snap_idx, snapshot in enumerate(urgencies_histories):
+            result[:, snap_idx, :] = snapshot[:, idx, :]
+        return result
+
     def repack_predator_histories_for_manim(
         state_history: "List[State]",
     ) -> List[np.typing.NDArray]:
