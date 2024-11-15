@@ -108,10 +108,14 @@ class Engine:
                 )
             )
             states = []
+            urgency_vectors = []
         else:
             states = [copy.deepcopy(self._state)]
+            # The shape is (urgencies_count, particles_count, dimensions_count).
+            urgency_vectors = [
+                np.zeros((3, self._state.p.shape[0], self._state.p.shape[1]))
+            ]
 
-        urgency_vectors = []
         for iteration in range(1, iterations + 1):
             if iteration % 10 == 0:
                 print("Simulating iteration {}/{}".format(iteration, iterations))
