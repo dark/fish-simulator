@@ -24,7 +24,7 @@ import numpy as np
 import scipy
 from utils import Utils
 from randomizer import Randomizer
-from typing import List
+from typing import List, Optional
 
 
 @attrs.define
@@ -58,7 +58,12 @@ class Config:
 
 @attrs.frozen(kw_only=True)
 class EngineRunResult:
+    # Snapshots of the various states the engine ran through.
     states: List[State]
+    # Optionally, the urgency vectors for each step the engine ran
+    # through. Each step is represented in an array with shape
+    # (urgencies_count, particles_count, dimensions_count).
+    urgencies: Optional[List[np.typing.NDArray]]
 
 
 class Engine:
@@ -87,7 +92,12 @@ class Engine:
             )
 
     def run(
-        self, *, timestep: float, iterations: int, skip_initial_states: int = 0
+        self,
+        *,
+        timestep: float,
+        iterations: int,
+        skip_initial_states: int = 0,
+        return_urgency_vectors: bool = False
     ) -> EngineRunResult:
         """Run the simulation, return a snapshot of all states."""
         print("Starting simulation with {} iterations ...".format(iterations))
@@ -101,19 +111,26 @@ class Engine:
         else:
             states = [copy.deepcopy(self._state)]
 
+        urgency_vectors = []
         for iteration in range(1, iterations + 1):
             if iteration % 10 == 0:
                 print("Simulating iteration {}/{}".format(iteration, iterations))
-            self._step_particles(timestep)
+
+            urgencies = self._step_particles(timestep, return_urgency_vectors)
             self._step_predators(timestep)
             if iteration > (skip_initial_states - 1):
                 # The math works so that skip_initial_states=i will
                 # skip the initial state and the (i-1) states after
                 # that (hence the -1).
                 states.append(copy.deepcopy(self._state))
-        return EngineRunResult(states=states)
+                if return_urgency_vectors:
+                    urgency_vectors.append(urgencies)
 
-    def _step_particles(self, timestep: float):
+        return EngineRunResult(
+            states=states, urgencies=urgency_vectors if return_urgency_vectors else None
+        )
+
+    def _step_particles(self, timestep: float, return_urgency_vectors: bool):
         """Execute one step of the simulation for all particles."""
         distances = scipy.spatial.distance.squareform(
             scipy.spatial.distance.pdist(self._state.p)
@@ -133,6 +150,7 @@ class Engine:
         self._state.v += self._state.a * timestep
         Utils.inplace_clip_by_abs(self._state.v, self._cfg.v_max)
         self._state.p += self._state.v * timestep
+        return np.array([u1, u2, u3]) if return_urgency_vectors else None
 
     def _step_predators(self, timestep: float):
         """Execute one step of the simulation for all predators."""

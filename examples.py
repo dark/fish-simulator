@@ -119,6 +119,10 @@ if __name__ == "__main__":
     )
     TwoDimensionsGrid().run(timestep=0.1, iterations=100, skip_initial_states=25)
     print(
+        " * Running: TwoDimensionsGrid().run(timestep=0.1, iterations=100, return_urgency_vectors=True)"
+    )
+    TwoDimensionsGrid().run(timestep=0.1, iterations=100, return_urgency_vectors=True)
+    print(
         " * Running: TwoDimensionsGridWithPredator().run(timestep=0.1, iterations=100)"
     )
     TwoDimensionsGridWithPredator().run(timestep=0.1, iterations=100)
