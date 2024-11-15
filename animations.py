@@ -242,6 +242,7 @@ class BaseTwoDimensionialScene(Scene):
             timestep=timestep,
             iterations=iterations,
             skip_initial_states=skip_initial_iterations,
+            return_urgency_vectors=(self._exemplar_info == self.ExemplarInfo.URGENCIES),
         )
         p_histories, _, a_histories = Utils.repack_particle_histories_for_manim(
             results.states
@@ -318,7 +319,37 @@ class BaseTwoDimensionialScene(Scene):
                     animations.append(line_animation)
                     self.add(line)
                 elif self._exemplar_info == self.ExemplarInfo.URGENCIES:
-                    pass
+                    # Here we want to display, for each exemplar, as
+                    # many lines as there are urgencies.
+                    urgencies = (
+                        self._exemplar_amplification
+                        * Utils.repack_one_particle_urgencies_for_manim(
+                            idx, results.urgencies
+                        )
+                    )
+                    urgencies_count = urgencies.shape[0]
+                    urgency_colors = [YELLOW, BLUE, RED]
+                    for urgency_idx, urgency_color in zip(
+                        range(urgencies_count), urgency_colors, strict=True
+                    ):
+                        u_ends = urgencies[urgency_idx, :] + p_points
+                        axes_urgency_ends = axes.c2p(*u_ends.T).T
+
+                        urgency_line = Line(
+                            stroke_width=1.5,
+                            buff=0,
+                            color=urgency_color,
+                            start=axes_p_points[0],
+                            end=axes_urgency_ends[0],
+                        )
+                        urgency_line_animation = MoveLineBetweenPoints(
+                            urgency_line,
+                            axes_p_points,
+                            axes_urgency_ends,
+                            run_time=render_run_time,
+                        )
+                        animations.append(urgency_line_animation)
+                        self.add(urgency_line)
 
         # Animate all predators, if there are any
         if predator_histories:
