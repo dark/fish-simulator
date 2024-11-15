@@ -63,10 +63,10 @@ class TwoDimensionsGrid:
             u1_p=1.0,
             u2_p=3.0,
             u2_dopt=1.0,
-            u4_p=10.0,
-            u4_dmax=3.0,
+            u3_p=10.0,
+            u3_dmax=3.0,
             uw=r.gen_random_matrix(
-                (self._PARTICLES_BY_DIM**self._SPACE_DIMENSIONS, 4),
+                (self._PARTICLES_BY_DIM**self._SPACE_DIMENSIONS, 3),
                 min_value=0.9,
                 max_value=1.0,
             ),

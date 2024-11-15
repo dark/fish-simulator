@@ -50,10 +50,10 @@ class Config:
     u1_p: float  # linear parameter for the 1st urgency component (species-wide)
     u2_p: float  # linear parameter for the 2nd urgency component (species-wide)
     u2_dopt: float  # optimal distance for the 2nd urgency component (species-wide)
-    u4_p: float  # linear parameter for the 4th urgency component (species-wide)
-    u4_dmax: float  # maximum distance that triggers a particle escapae for the 4th urgency component (species-wide)
+    u3_p: float  # linear parameter for the 3rd urgency component (species-wide)
+    u3_dmax: float  # maximum distance that triggers a particle escape for the 3rd urgency component (species-wide)
     # Per-individual config
-    uw: np.typing.NDArray  # (n, 4) weights for each urgency component (per-individual)
+    uw: np.typing.NDArray  # (n, 3) weights for each urgency component (per-individual)
 
 
 @attrs.frozen(kw_only=True)
@@ -75,7 +75,7 @@ class Engine:
         if (
             self._state.p.shape != self._state.v.shape
             or self._state.p.shape != self._state.a.shape
-            or self._cfg.uw.shape != (self._state.p.shape[0], 4)
+            or self._cfg.uw.shape != (self._state.p.shape[0], 3)
         ):
             raise ValueError(
                 "Inconsistent shapes: p={0} v={1} a={2} uw={3}".format(
@@ -121,9 +121,9 @@ class Engine:
         # Calculate every single urgency
         u1 = self._calculate_urgency1(distances)
         u2 = self._calculate_urgency2(distances)
-        u4 = self._calculate_urgency4(distances)
+        u3 = self._calculate_urgency3(distances)
         # Calculate and clip the total urgency
-        u_tot = u1 + u2 + u4
+        u_tot = u1 + u2 + u3
         self._state.a = u_tot / self._cfg.u_max * self._cfg.a_max
         Utils.inplace_clip_by_abs(self._state.a, self._cfg.a_max)
         # Add epsilon uncertainty to final acceleration matrix
@@ -246,17 +246,17 @@ class Engine:
         # Multiply by the appropriate weights.
         return u2_vector * self._cfg.u2_p * self._cfg.uw[:, 1].reshape((-1, 1))
 
-    def _calculate_urgency4(self, __unused_distances):
+    def _calculate_urgency3(self, __unused_distances):
         """Repels each particle from specially-designated "predator" particles.
 
         The strenght of this urgency is:
 
-        * when distance < u4_dmax: u4_p * (u4_dmax - distance) / u4_dmax
+        * when distance < u3_dmax: u3_p * (u3_dmax - distance) / u3_dmax
         *               otherwise: 0
 
-        This means that the urgency is equal to `u4_p` if
+        This means that the urgency is equal to `u3_p` if
         `distance=0`, then it linearly decreases as distance
-        decreases, reaching `u4_p=0` when `distance=u4_dmax.`
+        decreases, reaching `u3_p=0` when `distance=u3_dmax.`
 
         """
         # Many of the steps in this function replicate what has been
@@ -276,13 +276,13 @@ class Engine:
         # Select all particles that, for this component, are affected
         # by a predator.
         in_range = np.logical_and(
-            distances_from_predators > 0, distances_from_predators <= self._cfg.u4_dmax
+            distances_from_predators > 0, distances_from_predators <= self._cfg.u3_dmax
         )
         # Generate weights for how much each particle is affected.
         weights = np.zeros_like(in_range, dtype=float)
         np.divide(
-            self._cfg.u4_dmax - distances_from_predators,
-            self._cfg.u4_dmax * distances_from_predators,
+            self._cfg.u3_dmax - distances_from_predators,
+            self._cfg.u3_dmax * distances_from_predators,
             where=in_range,
             out=weights,
         )
@@ -292,17 +292,17 @@ class Engine:
         # computation in _calculate_urgency2.
         distance_vectors = self._state.p[:, np.newaxis] - self._state.pred_p
 
-        # The goal is to generate a u4_vector that is (n, d) in shape,
+        # The goal is to generate a u3_vector that is (n, d) in shape,
         # performing the matmul magic:
         #
         # (n, 1, p) * (n, p, d) = (n, 1, d)
         number_of_points = self._state.p.shape[0]
         number_of_predators = self._state.pred_p.shape[0]
-        u4_vector = np.matmul(
+        u3_vector = np.matmul(
             weights.reshape((number_of_points, 1, number_of_predators)),
             distance_vectors,
         ).reshape(number_of_points, -1) * self._rand.gen_epsilon_matrix(
             self._state.p.shape
         )
         # Multiply by the appropriate weights.
-        return u4_vector * self._cfg.u4_p * self._cfg.uw[:, 3].reshape((-1, 1))
+        return u3_vector * self._cfg.u3_p * self._cfg.uw[:, 2].reshape((-1, 1))
