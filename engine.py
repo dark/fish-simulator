@@ -56,6 +56,11 @@ class Config:
     uw: np.typing.NDArray  # (n, 4) weights for each urgency component (per-individual)
 
 
+@attrs.frozen(kw_only=True)
+class EngineRunResult:
+    states: List[State]
+
+
 class Engine:
     _state: State
     _cfg: Config
@@ -83,7 +88,7 @@ class Engine:
 
     def run(
         self, *, timestep: float, iterations: int, skip_initial_states: int = 0
-    ) -> List[State]:
+    ) -> EngineRunResult:
         """Run the simulation, return a snapshot of all states."""
         print("Starting simulation with {} iterations ...".format(iterations))
         if skip_initial_states > 0:
@@ -106,7 +111,7 @@ class Engine:
                 # skip the initial state and the (i-1) states after
                 # that (hence the -1).
                 states.append(copy.deepcopy(self._state))
-        return states
+        return EngineRunResult(states=states)
 
     def _step_particles(self, timestep: float):
         """Execute one step of the simulation for all particles."""

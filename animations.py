@@ -230,15 +230,15 @@ class BaseTwoDimensionialScene(Scene):
         )
 
         # Run the engine to compute all position states.
-        state_histories = self._config_to_render.run(
+        results = self._config_to_render.run(
             timestep=timestep,
             iterations=iterations,
             skip_initial_states=skip_initial_iterations,
         )
         p_histories, _, a_histories = Utils.repack_particle_histories_for_manim(
-            state_histories
+            results.states
         )
-        predator_histories = Utils.repack_predator_histories_for_manim(state_histories)
+        predator_histories = Utils.repack_predator_histories_for_manim(results.states)
 
         # Set up a set of x,y axes.
         x_axes_minmax = (
