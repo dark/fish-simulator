@@ -111,8 +111,14 @@ class TwoDimensionsGridWithPredator(TwoDimensionsGrid):
 
 
 if __name__ == "__main__":
-    # Run and print all examples.
-    result = TwoDimensionsGrid().run(timestep=0.1, iterations=300)
-    print(result)
-    result = TwoDimensionsGridWithPredator().run(timestep=0.1, iterations=300)
-    print(result)
+    # Run all examples and some parameter combinations.
+    print(" * Running: TwoDimensionsGrid().run(timestep=0.1, iterations=100)")
+    TwoDimensionsGrid().run(timestep=0.1, iterations=100)
+    print(
+        " * Running: TwoDimensionsGrid().run(timestep=0.1, iterations=100, skip_initial_states=25)"
+    )
+    TwoDimensionsGrid().run(timestep=0.1, iterations=100, skip_initial_states=25)
+    print(
+        " * Running: TwoDimensionsGridWithPredator().run(timestep=0.1, iterations=100)"
+    )
+    TwoDimensionsGridWithPredator().run(timestep=0.1, iterations=100)
