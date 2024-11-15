@@ -72,7 +72,7 @@ class TwoDimensionsGrid:
             ),
         )
 
-    def run(self, *, timestep: float, iterations: int, skip_initial_states: int = 0):
+    def run(self, *, timestep: float, iterations: int, **kwargs):
         p, v, a = self._create_initial_state()
         s = State(
             p,
@@ -88,12 +88,12 @@ class TwoDimensionsGrid:
         return engine.run(
             timestep=timestep,
             iterations=iterations,
-            skip_initial_states=skip_initial_states,
+            **kwargs,
         )
 
 
 class TwoDimensionsGridWithPredator(TwoDimensionsGrid):
-    def run(self, *, timestep: float, iterations: int, skip_initial_states: int = 0):
+    def run(self, *, timestep: float, iterations: int, **kwargs):
         p, v, a = self._create_initial_state()
         # Have one predator sweep from (15, 1) to (-15, 1) in the
         # first twenty seconds of the simulation.
@@ -106,7 +106,7 @@ class TwoDimensionsGridWithPredator(TwoDimensionsGrid):
         return engine.run(
             timestep=timestep,
             iterations=iterations,
-            skip_initial_states=skip_initial_states,
+            **kwargs,
         )
 
 
