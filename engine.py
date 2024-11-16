@@ -118,7 +118,9 @@ class Engine:
 
         for iteration in range(1, iterations + 1):
             if iteration % 10 == 0:
-                print("Simulating iteration {}/{}".format(iteration, iterations))
+                print(
+                    "\rSimulating iteration {}/{}".format(iteration, iterations), end=""
+                )
 
             urgencies = self._step_particles(timestep, return_urgency_vectors)
             self._step_predators(timestep)
@@ -130,6 +132,7 @@ class Engine:
                 if return_urgency_vectors:
                     urgency_vectors.append(urgencies)
 
+        print()
         return EngineRunResult(
             states=states, urgencies=urgency_vectors if return_urgency_vectors else None
         )
