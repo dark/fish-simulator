@@ -19,15 +19,24 @@
 
 from manim import *
 from animations import BaseTwoDimensionialScene
-from examples import TwoDimensionsGrid, TwoDimensionsGridWithPredator
+from examples import Grid2D, Grid2DWithPredator
 
 
-class TwoDimensionsGridDisplay(BaseTwoDimensionialScene):
+class Grid2DScene(BaseTwoDimensionialScene):
     def setup(self):
         super().setup()
-        self._config_to_render = TwoDimensionsGrid()
+        self._config_to_render = Grid2D()
         self._render_run_time = 30
-        self._do_not_render_initial_seconds = 0
+
+    def construct(self):
+        super().construct()
+
+
+class Grid2DSceneWithAcceleration(BaseTwoDimensionialScene):
+    def setup(self):
+        super().setup()
+        self._config_to_render = Grid2D()
+        self._render_run_time = 30
         self._exemplar_indices = {0, 10, 110, 120}
         self._exemplar_info = self.ExemplarInfo.ACCELERATION
 
@@ -35,12 +44,11 @@ class TwoDimensionsGridDisplay(BaseTwoDimensionialScene):
         super().construct()
 
 
-class TwoDimensionsGridDisplayWithUrgencies(BaseTwoDimensionialScene):
+class Grid2DSceneWithUrgencies(BaseTwoDimensionialScene):
     def setup(self):
         super().setup()
-        self._config_to_render = TwoDimensionsGrid()
+        self._config_to_render = Grid2D()
         self._render_run_time = 30
-        self._do_not_render_initial_seconds = 0
         self._exemplar_indices = {0, 10, 110, 120}
         self._exemplar_info = self.ExemplarInfo.URGENCIES
 
@@ -48,12 +56,21 @@ class TwoDimensionsGridDisplayWithUrgencies(BaseTwoDimensionialScene):
         super().construct()
 
 
-class TwoDimensionsGridWithPredatorDisplay(BaseTwoDimensionialScene):
+class Grid2DWithPredatorScene(BaseTwoDimensionialScene):
     def setup(self):
         super().setup()
-        self._config_to_render = TwoDimensionsGridWithPredator()
+        self._config_to_render = Grid2DWithPredator()
         self._render_run_time = 30
-        self._do_not_render_initial_seconds = 0
+
+    def construct(self):
+        super().construct()
+
+
+class Grid2DWithPredatorSceneWithAcceleration(BaseTwoDimensionialScene):
+    def setup(self):
+        super().setup()
+        self._config_to_render = Grid2DWithPredator()
+        self._render_run_time = 30
         self._exemplar_indices = {0, 10, 110, 120}
         self._exemplar_info = self.ExemplarInfo.ACCELERATION
 
@@ -61,12 +78,11 @@ class TwoDimensionsGridWithPredatorDisplay(BaseTwoDimensionialScene):
         super().construct()
 
 
-class TwoDimensionsGridWithPredatorDisplayWithUrgencies(BaseTwoDimensionialScene):
+class Grid2DWithPredatorSceneWithUrgencies(BaseTwoDimensionialScene):
     def setup(self):
         super().setup()
-        self._config_to_render = TwoDimensionsGridWithPredator()
+        self._config_to_render = Grid2DWithPredator()
         self._render_run_time = 30
-        self._do_not_render_initial_seconds = 0
         self._exemplar_indices = {0, 10, 110, 120}
         self._exemplar_info = self.ExemplarInfo.URGENCIES
 

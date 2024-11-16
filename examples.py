@@ -52,7 +52,7 @@ def _create_base_config(*, number_of_particles: int):
     )
 
 
-class TwoDimensionsGrid:
+class Grid2D:
 
     _SPACE_DIMENSIONS = 2
     _PARTICLES_BY_DIM = 11
@@ -89,7 +89,7 @@ class TwoDimensionsGrid:
         )
 
 
-class TwoDimensionsGridWithPredator(TwoDimensionsGrid):
+class Grid2DWithPredator(Grid2D):
     def run(self, *, timestep: float, iterations: int, **kwargs):
         p, v, a = self._create_initial_state()
         # Have one predator sweep from (15, 1) to (-15, 1) in the
@@ -109,17 +109,15 @@ class TwoDimensionsGridWithPredator(TwoDimensionsGrid):
 
 if __name__ == "__main__":
     # Run all examples and some parameter combinations.
-    print(" * Running: TwoDimensionsGrid().run(timestep=0.1, iterations=100)")
-    TwoDimensionsGrid().run(timestep=0.1, iterations=100)
+    print(" * Running: Grid2D().run(timestep=0.1, iterations=100)")
+    Grid2D().run(timestep=0.1, iterations=100)
     print(
-        " * Running: TwoDimensionsGrid().run(timestep=0.1, iterations=100, skip_initial_states=25)"
+        " * Running: Grid2D().run(timestep=0.1, iterations=100, skip_initial_states=25)"
     )
-    TwoDimensionsGrid().run(timestep=0.1, iterations=100, skip_initial_states=25)
+    Grid2D().run(timestep=0.1, iterations=100, skip_initial_states=25)
     print(
-        " * Running: TwoDimensionsGrid().run(timestep=0.1, iterations=100, return_urgency_vectors=True)"
+        " * Running: Grid2D().run(timestep=0.1, iterations=100, return_urgency_vectors=True)"
     )
-    TwoDimensionsGrid().run(timestep=0.1, iterations=100, return_urgency_vectors=True)
-    print(
-        " * Running: TwoDimensionsGridWithPredator().run(timestep=0.1, iterations=100)"
-    )
-    TwoDimensionsGridWithPredator().run(timestep=0.1, iterations=100)
+    Grid2D().run(timestep=0.1, iterations=100, return_urgency_vectors=True)
+    print(" * Running: Grid2DWithPredator().run(timestep=0.1, iterations=100)")
+    Grid2DWithPredator().run(timestep=0.1, iterations=100)
