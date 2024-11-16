@@ -23,12 +23,33 @@ from randomizer import Randomizer
 from typing import List
 
 
-def cartesian(array, dimensions):
+def _cartesian(array, dimensions):
     # https://stackoverflow.com/a/35608701
     all_dims = []
     for dim in range(dimensions):
         all_dims.append(array)
     return np.array(np.meshgrid(*all_dims)).T.reshape(-1, dimensions)
+
+
+def _create_base_config(*, number_of_particles: int):
+    r = Randomizer()
+    return Config(
+        v_max=5.0,
+        v_decay=0.9,
+        a_max=1.0,
+        d_max=7.5,
+        u_max=5.0,
+        u1_p=1.0,
+        u2_p=3.0,
+        u2_dopt=1.0,
+        u3_p=10.0,
+        u3_dmax=3.0,
+        uw=r.gen_random_matrix(
+            (number_of_particles, 3),
+            min_value=0.9,
+            max_value=1.0,
+        ),
+    )
 
 
 class TwoDimensionsGrid:
@@ -43,34 +64,10 @@ class TwoDimensionsGrid:
             -(self._PARTICLES_BY_DIM / 2), self._PARTICLES_BY_DIM / 2, dtype=int
         )
         # Re-casting to float because that's what all matrices use.
-        p = cartesian(one_dim, self._SPACE_DIMENSIONS).astype(float)
-        v = np.zeros(
-            (self._PARTICLES_BY_DIM**self._SPACE_DIMENSIONS, self._SPACE_DIMENSIONS)
-        )
-        a = np.zeros(
-            (self._PARTICLES_BY_DIM**self._SPACE_DIMENSIONS, self._SPACE_DIMENSIONS)
-        )
+        p = _cartesian(one_dim, self._SPACE_DIMENSIONS).astype(float)
+        v = np.zeros_like(p)
+        a = np.zeros_like(p)
         return p, v, a
-
-    def _create_config(self):
-        r = Randomizer()
-        return Config(
-            v_max=5.0,
-            v_decay=0.9,
-            a_max=1.0,
-            d_max=7.5,
-            u_max=5.0,
-            u1_p=1.0,
-            u2_p=3.0,
-            u2_dopt=1.0,
-            u3_p=10.0,
-            u3_dmax=3.0,
-            uw=r.gen_random_matrix(
-                (self._PARTICLES_BY_DIM**self._SPACE_DIMENSIONS, 3),
-                min_value=0.9,
-                max_value=1.0,
-            ),
-        )
 
     def run(self, *, timestep: float, iterations: int, **kwargs):
         p, v, a = self._create_initial_state()
@@ -83,7 +80,7 @@ class TwoDimensionsGrid:
             pred_v=np.zeros((0, self._SPACE_DIMENSIONS)),
             pred_a=np.zeros((0, self._SPACE_DIMENSIONS)),
         )
-        cfg = self._create_config()
+        cfg = _create_base_config(number_of_particles=p.shape[0])
         engine = Engine(s, cfg)
         return engine.run(
             timestep=timestep,
@@ -101,7 +98,7 @@ class TwoDimensionsGridWithPredator(TwoDimensionsGrid):
         pred_v = np.array([[-1.5, 0.0]])
         pred_a = np.array([[0.0, 0.0]])
         s = State(p, v, a, pred_p, pred_v, pred_a)
-        cfg = self._create_config()
+        cfg = _create_base_config(number_of_particles=p.shape[0])
         engine = Engine(s, cfg)
         return engine.run(
             timestep=timestep,
