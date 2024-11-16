@@ -52,9 +52,33 @@ def _create_base_config(*, number_of_particles: int):
     )
 
 
-class Grid:
+class BaseExample:
+
+    def _create_initial_particle_state(self):
+        # The derived class should implement this.
+        raise NotImplementedError
+
+    def _create_initial_predator_state(self):
+        # The derived class should implement this.
+        raise NotImplementedError
+
+    def run(self, *, timestep: float, iterations: int, **kwargs):
+        p, v, a = self._create_initial_particle_state()
+        pred_p, pred_v, pred_a = self._create_initial_predator_state()
+        s = State(p, v, a, pred_p, pred_v, pred_a)
+        cfg = _create_base_config(number_of_particles=p.shape[0])
+        engine = Engine(s, cfg)
+        return engine.run(
+            timestep=timestep,
+            iterations=iterations,
+            **kwargs,
+        )
+
+
+class Grid(BaseExample):
 
     def __init__(self, *, particles_by_dimension: int, space_dimensions: int):
+        super().__init__()
         self._PARTICLES_BY_DIM = particles_by_dimension
         self._SPACE_DIMENSIONS = space_dimensions
 
@@ -73,18 +97,6 @@ class Grid:
     def _create_initial_predator_state(self):
         # The derived class should implement this.
         raise NotImplementedError
-
-    def run(self, *, timestep: float, iterations: int, **kwargs):
-        p, v, a = self._create_initial_particle_state()
-        pred_p, pred_v, pred_a = self._create_initial_predator_state()
-        s = State(p, v, a, pred_p, pred_v, pred_a)
-        cfg = _create_base_config(number_of_particles=p.shape[0])
-        engine = Engine(s, cfg)
-        return engine.run(
-            timestep=timestep,
-            iterations=iterations,
-            **kwargs,
-        )
 
 
 class Grid2D(Grid):
