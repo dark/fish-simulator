@@ -20,7 +20,7 @@
 import enum
 from animation import MoveAlongPoints, MoveLineBetweenPoints, SecondsCounter
 from manim import *
-from utils import Utils
+from util import Utils
 from typing import Tuple
 
 

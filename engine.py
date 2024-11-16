@@ -22,7 +22,7 @@ import copy
 import math
 import numpy as np
 import scipy
-from utils import Utils
+from util import Utils
 from randomizer import Randomizer
 from typing import List, Optional
 
