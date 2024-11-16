@@ -52,12 +52,13 @@ def _create_base_config(*, number_of_particles: int):
     )
 
 
-class Grid2D:
+class Grid:
 
-    _SPACE_DIMENSIONS = 2
-    _PARTICLES_BY_DIM = 11
+    def __init__(self, *, particles_by_dimension: int, space_dimensions: int):
+        self._PARTICLES_BY_DIM = particles_by_dimension
+        self._SPACE_DIMENSIONS = space_dimensions
 
-    def _create_initial_state(self):
+    def _create_initial_particle_state(self):
         # Cast to int necessary to make initial spacing nicer in this
         # sample configuration.
         one_dim = np.arange(
@@ -69,34 +70,13 @@ class Grid2D:
         a = np.zeros_like(p)
         return p, v, a
 
-    def run(self, *, timestep: float, iterations: int, **kwargs):
-        p, v, a = self._create_initial_state()
-        s = State(
-            p,
-            v,
-            a,
-            # This example has no predators.
-            pred_p=np.zeros((0, self._SPACE_DIMENSIONS)),
-            pred_v=np.zeros((0, self._SPACE_DIMENSIONS)),
-            pred_a=np.zeros((0, self._SPACE_DIMENSIONS)),
-        )
-        cfg = _create_base_config(number_of_particles=p.shape[0])
-        engine = Engine(s, cfg)
-        return engine.run(
-            timestep=timestep,
-            iterations=iterations,
-            **kwargs,
-        )
+    def _create_initial_predator_state(self):
+        # The derived class should implement this.
+        raise NotImplementedError
 
-
-class Grid2DWithPredator(Grid2D):
     def run(self, *, timestep: float, iterations: int, **kwargs):
-        p, v, a = self._create_initial_state()
-        # Have one predator sweep from (15, 1) to (-15, 1) in the
-        # first twenty seconds of the simulation.
-        pred_p = np.array([[15.0, 1.0]])
-        pred_v = np.array([[-1.5, 0.0]])
-        pred_a = np.array([[0.0, 0.0]])
+        p, v, a = self._create_initial_particle_state()
+        pred_p, pred_v, pred_a = self._create_initial_predator_state()
         s = State(p, v, a, pred_p, pred_v, pred_a)
         cfg = _create_base_config(number_of_particles=p.shape[0])
         engine = Engine(s, cfg)
@@ -105,6 +85,29 @@ class Grid2DWithPredator(Grid2D):
             iterations=iterations,
             **kwargs,
         )
+
+
+class Grid2D(Grid):
+
+    def __init__(self):
+        super().__init__(particles_by_dimension=11, space_dimensions=2)
+
+    def _create_initial_predator_state(self):
+        # This example has no predators.
+        pred_p = np.zeros((0, self._SPACE_DIMENSIONS))
+        pred_v = np.zeros((0, self._SPACE_DIMENSIONS))
+        pred_a = np.zeros((0, self._SPACE_DIMENSIONS))
+        return pred_p, pred_v, pred_a
+
+
+class Grid2DWithPredator(Grid2D):
+    def _create_initial_predator_state(self):
+        # Have one predator sweep from (15, 1) to (-15, 1) in the
+        # first twenty seconds of the simulation.
+        pred_p = np.array([[15.0, 1.0]])
+        pred_v = np.array([[-1.5, 0.0]])
+        pred_a = np.array([[0.0, 0.0]])
+        return pred_p, pred_v, pred_a
 
 
 if __name__ == "__main__":
