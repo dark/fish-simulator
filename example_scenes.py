@@ -19,7 +19,7 @@
 
 from manim import *
 from animations import BaseTwoDimensionialScene
-from examples import Grid2D, Grid2DWithPredator
+from examples import Circle, Grid2D, Grid2DWithPredator
 
 
 class Grid2DScene(BaseTwoDimensionialScene):
@@ -85,6 +85,16 @@ class Grid2DWithPredatorSceneWithUrgencies(BaseTwoDimensionialScene):
         self._render_run_time = 30
         self._exemplar_indices = {0, 10, 110, 120}
         self._exemplar_info = self.ExemplarInfo.URGENCIES
+
+    def construct(self):
+        super().construct()
+
+
+class Circle2DScene(BaseTwoDimensionialScene):
+    def setup(self):
+        super().setup()
+        self._config_to_render = Circle(particles_to_draw=100, radius=1.0)
+        self._render_run_time = 30
 
     def construct(self):
         super().construct()

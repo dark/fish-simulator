@@ -122,6 +122,40 @@ class Grid2DWithPredator(Grid2D):
         return pred_p, pred_v, pred_a
 
 
+class Circle(BaseExample):
+
+    def __init__(self, *, particles_to_draw: int, radius: float):
+        super().__init__()
+        self._PARTICLES_COUNT = particles_to_draw
+        self._RADIUS = radius
+        self._SPACE_DIMENSIONS = 2
+
+    def _create_initial_particle_state(self):
+        r = Randomizer()
+
+        # https://stackoverflow.com/q/5837572/1451820
+        distance = self._RADIUS * np.sqrt(
+            r.gen_random_matrix((self._PARTICLES_COUNT), min_value=0.0, max_value=1)
+        )
+        theta = r.gen_random_matrix(
+            (self._PARTICLES_COUNT), min_value=0.0, max_value=2.0 * np.pi
+        )
+        p = np.zeros((self._PARTICLES_COUNT, self._SPACE_DIMENSIONS))
+        p[:, 0] = distance * np.cos(theta)
+        p[:, 1] = distance * np.sin(theta)
+
+        v = np.zeros_like(p)
+        a = np.zeros_like(p)
+        return p, v, a
+
+    def _create_initial_predator_state(self):
+        # This example has no predators.
+        pred_p = np.zeros((0, self._SPACE_DIMENSIONS))
+        pred_v = np.zeros((0, self._SPACE_DIMENSIONS))
+        pred_a = np.zeros((0, self._SPACE_DIMENSIONS))
+        return pred_p, pred_v, pred_a
+
+
 if __name__ == "__main__":
     # Run all examples and some parameter combinations.
     print(" * Running: Grid2D().run(timestep=0.1, iterations=100)")
@@ -136,3 +170,7 @@ if __name__ == "__main__":
     Grid2D().run(timestep=0.1, iterations=100, return_urgency_vectors=True)
     print(" * Running: Grid2DWithPredator().run(timestep=0.1, iterations=100)")
     Grid2DWithPredator().run(timestep=0.1, iterations=100)
+    print(
+        " * Running: Circle(particles_to_draw=100, radius=1.0).run(timestep=0.1, iterations=100)"
+    )
+    Circle(particles_to_draw=100, radius=1.0).run(timestep=0.1, iterations=100)
