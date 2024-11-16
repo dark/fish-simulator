@@ -18,6 +18,7 @@
 #
 
 import enum
+from animation import MoveAlongPoints, MoveLineBetweenPoints, SecondsCounter
 from manim import *
 from utils import Utils
 from typing import Tuple
@@ -98,78 +99,6 @@ def _generate_dynamic_2d_axes(
         y_length=y_length,
         # axis_config={"include_numbers": True},
     )
-
-
-class SecondsCounter(Animation):
-    def __init__(self, number: DecimalNumber, begin: int, end: int, **kwargs) -> None:
-        self._begin = begin
-        self._end = end
-        # Pass number as the mobject of the animation
-        super().__init__(number, **kwargs)
-
-    def interpolate_mobject(self, alpha: float) -> None:
-        # Set value of DecimalNumber according to alpha
-        self.mobject.set_value(self._begin + alpha * (self._end - self._begin))
-
-
-class MoveAlongPoints(Animation):
-    """
-    Move a Mobject exactly along the points provided.
-    """
-
-    def __init__(
-        self,
-        mobject: Mobject,
-        points: np.typing.NDArray,
-        **kwargs,
-    ) -> None:
-        self._points = points
-        self._last_index = len(points) - 1
-        # Pass provided mobject as the mobject of the animation
-        super().__init__(mobject, **kwargs)
-
-    def interpolate_mobject(self, alpha: float) -> None:
-        # The goal is to return the point from `self._points` at the
-        # right index in `[0, last_index]` based on
-        # `alpha*len(points)`. Due to floating point math, rounding is
-        # expected.
-        self.mobject.move_to(self._points[round(alpha * self._last_index)])
-
-
-class MoveLineBetweenPoints(Animation):
-    """
-    Move a Line object (or any derived class) between the points provided.
-    """
-
-    def __init__(
-        self,
-        mobject: Line,
-        start_points: np.typing.NDArray,
-        end_points: np.typing.NDArray,
-        **kwargs,
-    ) -> None:
-        self._start_points = start_points
-        self._end_points = end_points
-        self._last_index = len(start_points) - 1
-        if len(start_points) != len(end_points):
-            raise ValueError(
-                "Inconsistent array lengths: {} and {}".format(
-                    len(start_points), len(end_points)
-                )
-            )
-
-        # Pass provided mobject as the mobject of the animation
-        super().__init__(mobject, **kwargs)
-
-    def interpolate_mobject(self, alpha: float) -> None:
-        # The goal is to return the point from `self._start_points` at
-        # the right index in `[0, last_index]` based on
-        # `alpha*len(points)`. Same for `self._end_points`.
-        #
-        # Due to floating point math, rounding is expected.
-        start = self._start_points[round(alpha * self._last_index)]
-        end = self._end_points[round(alpha * self._last_index)]
-        self.mobject.put_start_and_end_on(start, end)
 
 
 class BaseTwoDimensionialScene(Scene):

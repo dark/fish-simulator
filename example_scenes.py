@@ -18,7 +18,7 @@
 #
 
 from manim import *
-from animations import BaseTwoDimensionialScene
+from scene import BaseTwoDimensionialScene
 from examples import Circle, Grid2D, Grid2DWithPredator
 
 
