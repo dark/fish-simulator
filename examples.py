@@ -146,7 +146,7 @@ class Circle(BaseExample):
         return p, v, a
 
     def _create_initial_predator_state(self):
-        # By default there are no predators. The derived classes can
+        # By default there are no predators. The derived classes canrr
         # override this.
         pred_p = np.zeros((0, self._SPACE_DIMENSIONS))
         pred_v = np.zeros((0, self._SPACE_DIMENSIONS))
@@ -158,6 +158,16 @@ class Grid3D(Grid):
 
     def __init__(self):
         super().__init__(particles_by_dimension=7, space_dimensions=3)
+
+
+class Grid3DWithPredator(Grid3D):
+    def _create_initial_predator_state(self):
+        # Have one predator sweep from (15, 0, 1) to (-15, 0, 1) in the
+        # first twenty seconds of the simulation.
+        pred_p = np.array([[15.0, 0.0, 1.0]])
+        pred_v = np.array([[-1.5, 0.0, 0.0]])
+        pred_a = np.array([[0.0, 0.0, 0.0]])
+        return pred_p, pred_v, pred_a
 
 
 if __name__ == "__main__":
@@ -180,3 +190,5 @@ if __name__ == "__main__":
     Circle(particles_to_draw=100, radius=1.0).run(timestep=0.1, iterations=100)
     print(" * Running: Grid3D().run(timestep=0.1, iterations=100)")
     Grid3D().run(timestep=0.1, iterations=100)
+    print(" * Running: Grid3DWithPredator().run(timestep=0.1, iterations=100)")
+    Grid3DWithPredator().run(timestep=0.1, iterations=100)

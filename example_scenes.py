@@ -19,7 +19,7 @@
 
 from manim import *
 from scene import TwoDimensionialScene, ThreeDimensionialScene
-from examples import Circle, Grid2D, Grid2DWithPredator, Grid3D
+from examples import Circle, Grid2D, Grid2DWithPredator, Grid3D, Grid3DWithPredator
 
 
 class Grid2DScene(TwoDimensionialScene):
@@ -105,6 +105,16 @@ class Grid3DScene(ThreeDimensionialScene):
         super().setup()
         self._config_to_render = Grid3D()
         self._render_run_time = 10
+
+    def construct(self):
+        super().construct()
+
+
+class Grid3DWithPredatorScene(ThreeDimensionialScene):
+    def setup(self):
+        super().setup()
+        self._config_to_render = Grid3DWithPredator()
+        self._render_run_time = 30
 
     def construct(self):
         super().construct()
