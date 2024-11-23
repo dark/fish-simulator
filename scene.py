@@ -319,6 +319,11 @@ class BaseSceneMixin:
         )
         self.add(seconds_text, seconds_number)
 
+        # Set the appropriate camera orientation before rendering. The
+        # specific derived class (2d or 3d) will decide what to do
+        # here.
+        self._set_camera_orientation()
+
         self.play(
             *animations,
             SecondsCounter(
@@ -339,8 +344,13 @@ class BaseSceneMixin:
 
 
 class TwoDimensionialScene(BaseSceneMixin, Scene):
-    pass
+    def _set_camera_orientation(self):
+        # no-op for a 2d scene
+        pass
 
 
 class ThreeDimensionialScene(BaseSceneMixin, ThreeDScene):
-    pass
+    def _set_camera_orientation(self):
+        self.set_camera_orientation(phi=45 * DEGREES, theta=-45 * DEGREES)
+        # This helps give the scene a 3D feel
+        self.begin_3dillusion_camera_rotation(rate=0.2)
