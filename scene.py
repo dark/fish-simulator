@@ -413,7 +413,7 @@ class BaseSceneMixin:
         # Set the appropriate camera orientation before rendering. The
         # specific derived class (2d or 3d) will decide what to do
         # here.
-        self._set_camera_orientation()
+        self._set_camera_orientation(axes)
 
         self.play(
             *animations,
@@ -435,13 +435,35 @@ class BaseSceneMixin:
 
 
 class TwoDimensionialScene(BaseSceneMixin, Scene):
-    def _set_camera_orientation(self):
+    def _set_camera_orientation(self, axes):
         # no-op for a 2d scene
         pass
 
 
 class ThreeDimensionialScene(BaseSceneMixin, ThreeDScene):
-    def _set_camera_orientation(self):
-        self.set_camera_orientation(phi=60 * DEGREES, theta=-45 * DEGREES)
-        # This helps give the scene a 3D feel
+    def _set_camera_orientation(self, axes):
+        # Orient the camera to the given polar angle (phi) and
+        # azimuthal angle (theta), focusing on the middle point of all
+        # axes.
+        axes_center = np.array(
+            [
+                (axes.x_range[0] + axes.x_range[1]) / 2,
+                (axes.y_range[0] + axes.y_range[1]) / 2,
+                (axes.z_range[0] + axes.z_range[1]) / 2,
+            ]
+        )
+        print("3d_axes_center={}".format(axes_center))
+        frame_center = axes.c2p(*axes_center)
+        print("Axes-corrected frame center={}".format(frame_center))
+
+        # Because of an unspecified bug somewhere, it looks like the
+        # camera will overshoot the provided frame center on the X and
+        # Y axis. We correct this on the fly.
+        self.set_camera_orientation(
+            phi=60 * DEGREES,
+            theta=-45 * DEGREES,
+            frame_center=(frame_center * np.array([0.5, 0.5, 1.0])),
+        )
+        # This helps give the scene a 3D feel (however, note: this
+        # negatively impacts rendering performance)
         self.begin_3dillusion_camera_rotation(rate=0.2)
