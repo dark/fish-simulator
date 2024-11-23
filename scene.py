@@ -114,7 +114,7 @@ def _generate_axes(p_histories):
     return _generate_dynamic_2d_axes(x_axes_minmax, y_axes_minmax)
 
 
-class BaseTwoDimensionialScene(Scene):
+class BaseSceneMixin:
     class ExemplarInfo(enum.Enum):
         NONE = 0
         ACCELERATION = 1
@@ -336,3 +336,7 @@ class BaseTwoDimensionialScene(Scene):
                 run_time=render_run_time,
             ),
         )
+
+
+class BaseTwoDimensionialScene(BaseSceneMixin, Scene):
+    pass
