@@ -24,7 +24,7 @@ from util import Utils
 from typing import Tuple
 
 
-def _generate_2d_axis_range(
+def _generate_axis_range(
     minmax: Tuple[float, float], length: float, buffer_factor: float
 ):
     midpoint = (minmax[1] + minmax[0]) / 2
@@ -78,10 +78,10 @@ def _generate_dynamic_2d_axes(
     )
     # The buffer factor would give a range of x=[-14, 14] for viewport
     # x=[-9.5, 9.5].
-    x_range = _generate_2d_axis_range(x_axes_minmax, viewport_length_x, 28.0 / 19.0)
+    x_range = _generate_axis_range(x_axes_minmax, viewport_length_x, 28.0 / 19.0)
     # The buffer factor would give a range of y=[-7, 7] for viewport
     # y=[-5, 5].
-    y_range = _generate_2d_axis_range(y_axes_minmax, viewport_length_y, 14.0 / 10.0)
+    y_range = _generate_axis_range(y_axes_minmax, viewport_length_y, 14.0 / 10.0)
     print("Using x axis range: {}".format(x_range))
     print("Using y axis range: {}".format(y_range))
 
@@ -157,13 +157,13 @@ def _generate_dynamic_3d_axes(
 
     # The buffer factor would give a range of x=[-15, 15] for viewport
     # x=[-5, 5].
-    x_range = _generate_2d_axis_range(x_axes_minmax, viewport_length_x, 30.0 / 10.0)
+    x_range = _generate_axis_range(x_axes_minmax, viewport_length_x, 30.0 / 10.0)
     # The buffer factor would give a range of y=[-10, 10] for viewport
     # y=[-5, 5].
-    y_range = _generate_2d_axis_range(y_axes_minmax, viewport_length_y, 20.0 / 10.0)
+    y_range = _generate_axis_range(y_axes_minmax, viewport_length_y, 20.0 / 10.0)
     # The buffer factor would give a range of z=[-5, 5] for viewport
     # y=[-4, 4].
-    z_range = _generate_2d_axis_range(z_axes_minmax, viewport_length_z, 10.0 / 8.0)
+    z_range = _generate_axis_range(z_axes_minmax, viewport_length_z, 10.0 / 8.0)
     print("Using x axis range: {}".format(x_range))
     print("Using y axis range: {}".format(y_range))
     print("Using z axis range: {}".format(z_range))
