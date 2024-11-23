@@ -95,21 +95,18 @@ class Grid(BaseExample):
         return p, v, a
 
     def _create_initial_predator_state(self):
-        # The derived class should implement this.
-        raise NotImplementedError
+        # By default there are no predators. The derived classes can
+        # override this.
+        pred_p = np.zeros((0, self._SPACE_DIMENSIONS))
+        pred_v = np.zeros((0, self._SPACE_DIMENSIONS))
+        pred_a = np.zeros((0, self._SPACE_DIMENSIONS))
+        return pred_p, pred_v, pred_a
 
 
 class Grid2D(Grid):
 
     def __init__(self):
         super().__init__(particles_by_dimension=11, space_dimensions=2)
-
-    def _create_initial_predator_state(self):
-        # This example has no predators.
-        pred_p = np.zeros((0, self._SPACE_DIMENSIONS))
-        pred_v = np.zeros((0, self._SPACE_DIMENSIONS))
-        pred_a = np.zeros((0, self._SPACE_DIMENSIONS))
-        return pred_p, pred_v, pred_a
 
 
 class Grid2DWithPredator(Grid2D):
@@ -149,7 +146,8 @@ class Circle(BaseExample):
         return p, v, a
 
     def _create_initial_predator_state(self):
-        # This example has no predators.
+        # By default there are no predators. The derived classes can
+        # override this.
         pred_p = np.zeros((0, self._SPACE_DIMENSIONS))
         pred_v = np.zeros((0, self._SPACE_DIMENSIONS))
         pred_a = np.zeros((0, self._SPACE_DIMENSIONS))
