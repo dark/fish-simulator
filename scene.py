@@ -441,6 +441,15 @@ class TwoDimensionialScene(BaseSceneMixin, Scene):
 
 
 class ThreeDimensionialScene(BaseSceneMixin, ThreeDScene):
+    def setup(self):
+        super().setup()
+
+        # Init additional optional parameters with their default values.
+
+        # Whether to animate the camera to give the scene a slight 3d
+        # feel.
+        self._animate_camera = True
+
     def _set_camera_orientation(self, axes):
         # Orient the camera to the given polar angle (phi) and
         # azimuthal angle (theta), focusing on the middle point of all
@@ -459,6 +468,8 @@ class ThreeDimensionialScene(BaseSceneMixin, ThreeDScene):
         # Because of an unspecified bug somewhere, it looks like the
         # camera will overshoot the provided frame center on the X and
         # Y axis. We correct this on the fly.
+        #
+        # TODO: debug and figure out where the bug is coming from
         self.set_camera_orientation(
             phi=60 * DEGREES,
             theta=-45 * DEGREES,
@@ -466,4 +477,5 @@ class ThreeDimensionialScene(BaseSceneMixin, ThreeDScene):
         )
         # This helps give the scene a 3D feel (however, note: this
         # negatively impacts rendering performance)
-        self.begin_3dillusion_camera_rotation(rate=0.2)
+        if self._animate_camera:
+            self.begin_3dillusion_camera_rotation(rate=0.2)
