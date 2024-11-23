@@ -119,6 +119,12 @@ class Grid2DWithPredator(Grid2D):
         return pred_p, pred_v, pred_a
 
 
+class Grid3D(Grid):
+
+    def __init__(self):
+        super().__init__(particles_by_dimension=7, space_dimensions=3)
+
+
 class Circle(BaseExample):
 
     def __init__(self, *, particles_to_draw: int, radius: float):
@@ -168,6 +174,8 @@ if __name__ == "__main__":
     Grid2D().run(timestep=0.1, iterations=100, return_urgency_vectors=True)
     print(" * Running: Grid2DWithPredator().run(timestep=0.1, iterations=100)")
     Grid2DWithPredator().run(timestep=0.1, iterations=100)
+    print(" * Running: Grid3D().run(timestep=0.1, iterations=100)")
+    Grid3D().run(timestep=0.1, iterations=100)
     print(
         " * Running: Circle(particles_to_draw=100, radius=1.0).run(timestep=0.1, iterations=100)"
     )
