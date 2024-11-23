@@ -378,6 +378,6 @@ class TwoDimensionialScene(BaseSceneMixin, Scene):
 
 class ThreeDimensionialScene(BaseSceneMixin, ThreeDScene):
     def _set_camera_orientation(self):
-        self.set_camera_orientation(phi=45 * DEGREES, theta=-45 * DEGREES)
+        self.set_camera_orientation(phi=60 * DEGREES, theta=-45 * DEGREES)
         # This helps give the scene a 3D feel
         self.begin_3dillusion_camera_rotation(rate=0.2)
