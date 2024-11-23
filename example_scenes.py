@@ -90,21 +90,21 @@ class Grid2DWithPredatorSceneWithUrgencies(TwoDimensionialScene):
         super().construct()
 
 
-class Grid3DScene(ThreeDimensionialScene):
-    def setup(self):
-        super().setup()
-        self._config_to_render = Grid3D()
-        self._render_run_time = 10
-
-    def construct(self):
-        super().construct()
-
-
 class Circle2DScene(TwoDimensionialScene):
     def setup(self):
         super().setup()
         self._config_to_render = Circle(particles_to_draw=100, radius=1.0)
         self._render_run_time = 30
+
+    def construct(self):
+        super().construct()
+
+
+class Grid3DScene(ThreeDimensionialScene):
+    def setup(self):
+        super().setup()
+        self._config_to_render = Grid3D()
+        self._render_run_time = 10
 
     def construct(self):
         super().construct()
