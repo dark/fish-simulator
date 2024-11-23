@@ -38,7 +38,7 @@ def _generate_2d_axis_range(
 def _generate_dynamic_2d_axes(
     x_axes_minmax: Tuple[float, float], y_axes_minmax: Tuple[float, float]
 ):
-    """Generates a dynamic set of axes.
+    """Generates a dynamic set of 2D axes.
 
     This takes into consideration the min/max values the points to be
     displayed have on either axis.
@@ -101,17 +101,44 @@ def _generate_dynamic_2d_axes(
     )
 
 
+def _generate_dynamic_3d_axes(
+    x_axes_minmax: Tuple[float, float],
+    y_axes_minmax: Tuple[float, float],
+    z_axes_minmax: Tuple[float, float],
+):
+    """Generates a dynamic set of 3D axes.
+
+    This takes into consideration the min/max values the points to be
+    displayed have on either axis.
+
+    """
+    x_range = (x_axes_minmax[0], x_axes_minmax[1], 1)
+    y_range = (y_axes_minmax[0], y_axes_minmax[1], 1)
+    z_range = (z_axes_minmax[0], z_axes_minmax[1], 1)
+    print("Using x axis range: {}".format(x_range))
+    print("Using y axis range: {}".format(y_range))
+    print("Using z axis range: {}".format(z_range))
+    return ThreeDAxes(x_range=x_range, y_range=y_range, z_range=z_range, tips=False)
+
+
 def _generate_axes(p_histories):
     """Generates a set of axes based on spatial dimensions."""
-    x_axes_minmax = (
-        min([min(p[:, 0]) for p in p_histories]),
-        max([max(p[:, 0]) for p in p_histories]),
-    )
-    y_axes_minmax = (
-        min([min(p[:, 1]) for p in p_histories]),
-        max([max(p[:, 1]) for p in p_histories]),
-    )
-    return _generate_dynamic_2d_axes(x_axes_minmax, y_axes_minmax)
+    space_dimensions = p_histories[0].shape[1]
+
+    all_axes_minmaxes = []
+    for d in range(space_dimensions):
+        one_axis_minmax = (
+            min([min(p[:, d]) for p in p_histories]),
+            max([max(p[:, d]) for p in p_histories]),
+        )
+        all_axes_minmaxes.append(one_axis_minmax)
+
+    if space_dimensions == 2:
+        return _generate_dynamic_2d_axes(*all_axes_minmaxes)
+    elif space_dimensions == 3:
+        return _generate_dynamic_3d_axes(*all_axes_minmaxes)
+    else:
+        raise ValueError("unsupported space dimensions: {}".format(space_dimensions))
 
 
 class BaseSceneMixin:
