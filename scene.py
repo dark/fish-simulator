@@ -101,6 +101,19 @@ def _generate_dynamic_2d_axes(
     )
 
 
+def _generate_axes(p_histories):
+    """Generates a set of axes based on spatial dimensions."""
+    x_axes_minmax = (
+        min([min(p[:, 0]) for p in p_histories]),
+        max([max(p[:, 0]) for p in p_histories]),
+    )
+    y_axes_minmax = (
+        min([min(p[:, 1]) for p in p_histories]),
+        max([max(p[:, 1]) for p in p_histories]),
+    )
+    return _generate_dynamic_2d_axes(x_axes_minmax, y_axes_minmax)
+
+
 class BaseTwoDimensionialScene(Scene):
     class ExemplarInfo(enum.Enum):
         NONE = 0
@@ -178,16 +191,8 @@ class BaseTwoDimensionialScene(Scene):
         )
         predator_histories = Utils.repack_predator_histories_for_manim(results.states)
 
-        # Set up a set of x,y axes.
-        x_axes_minmax = (
-            min([min(p[:, 0]) for p in p_histories]),
-            max([max(p[:, 0]) for p in p_histories]),
-        )
-        y_axes_minmax = (
-            min([min(p[:, 1]) for p in p_histories]),
-            max([max(p[:, 1]) for p in p_histories]),
-        )
-        axes = _generate_dynamic_2d_axes(x_axes_minmax, y_axes_minmax)
+        # Set up the axes.
+        axes = _generate_axes(p_histories)
         self.add(axes)
 
         # Create an animation that will move a dot along the imaginary
