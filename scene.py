@@ -109,16 +109,80 @@ def _generate_dynamic_3d_axes(
     """Generates a dynamic set of 3D axes.
 
     This takes into consideration the min/max values the points to be
-    displayed have on either axis.
+    displayed have on all axes.
 
     """
-    x_range = (x_axes_minmax[0], x_axes_minmax[1], 1)
-    y_range = (y_axes_minmax[0], y_axes_minmax[1], 1)
-    z_range = (z_axes_minmax[0], z_axes_minmax[1], 1)
+
+    # The reasoning applied here will be similar to the one for 2d
+    # axes.
+    #
+    # A config of:
+    #
+    #  x=[-15,15], y=[-10, 10], z=[-5, 5]
+    #  x_length=30, y_length=20, z_length=10
+    #
+    # is pleasant and displays a viewport of (theorically)
+    #
+    #  x=[-14,7], y=[-7, 12], z=[-5, 4]
+    #
+    # even though after camera rotation and perspective the really
+    # useful part is:
+    #
+    #  x=[-5,5], y=[-5, 5], z=[-4, 4]
+
+    # The minimum length of 10 corresponds to the x=[-5, 5] viewport.
+    smallest_viewport_length_x = max(x_axes_minmax[1] - x_axes_minmax[0], 10.0)
+    # The minimum length of 10 corresponds to the y=[-5, 5] viewport.
+    smallest_viewport_length_y = max(y_axes_minmax[1] - y_axes_minmax[0], 10.0)
+    # The minimum length of 8 corresponds to the z=[-4, 4] viewport.
+    smallest_viewport_length_z = max(z_axes_minmax[1] - z_axes_minmax[0], 8.0)
+
+    # Check which viewports need to widen to keep the expected 10:10:8 ratio.
+    viewport_length_x = max(smallest_viewport_length_x, smallest_viewport_length_y)
+    viewport_length_y = max(smallest_viewport_length_x, smallest_viewport_length_y)
+    if viewport_length_x / smallest_viewport_length_z < 10.0 / 8.0:
+        # x and y need to stretch
+        viewport_length_x = smallest_viewport_length_z * 10.0 / 8.0
+        viewport_length_y = smallest_viewport_length_z * 10.0 / 8.0
+        viewport_length_z = smallest_viewport_length_z
+    else:
+        # z needs to stretch
+        viewport_length_z = viewport_length_x / (10.0 / 8.0)
+
+    print(
+        "Using dynamic viewport with ratio x:y:z={}:{}:{}".format(
+            viewport_length_x, viewport_length_y, viewport_length_z
+        )
+    )
+
+    # The buffer factor would give a range of x=[-15, 15] for viewport
+    # x=[-5, 5].
+    x_range = _generate_2d_axis_range(x_axes_minmax, viewport_length_x, 30.0 / 10.0)
+    # The buffer factor would give a range of y=[-10, 10] for viewport
+    # y=[-5, 5].
+    y_range = _generate_2d_axis_range(y_axes_minmax, viewport_length_y, 20.0 / 10.0)
+    # The buffer factor would give a range of z=[-5, 5] for viewport
+    # y=[-4, 4].
+    z_range = _generate_2d_axis_range(z_axes_minmax, viewport_length_z, 10.0 / 8.0)
     print("Using x axis range: {}".format(x_range))
     print("Using y axis range: {}".format(y_range))
     print("Using z axis range: {}".format(z_range))
-    return ThreeDAxes(x_range=x_range, y_range=y_range, z_range=z_range, tips=False)
+
+    x_length = 30
+    y_length = 20
+    z_length = 10
+    print("Using lengths: x={} y={} z={}".format(x_length, y_length, z_length))
+
+    return ThreeDAxes(
+        x_range=x_range,
+        y_range=y_range,
+        z_range=z_range,
+        tips=False,
+        x_length=x_length,
+        y_length=y_length,
+        z_length=z_length,
+        # axis_config={"include_numbers": True},
+    )
 
 
 def _generate_axes(p_histories):
