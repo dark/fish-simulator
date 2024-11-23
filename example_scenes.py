@@ -18,11 +18,11 @@
 #
 
 from manim import *
-from scene import BaseTwoDimensionialScene
+from scene import TwoDimensionialScene, ThreeDimensionialScene
 from examples import Circle, Grid2D, Grid2DWithPredator, Grid3D
 
 
-class Grid2DScene(BaseTwoDimensionialScene):
+class Grid2DScene(TwoDimensionialScene):
     def setup(self):
         super().setup()
         self._config_to_render = Grid2D()
@@ -32,7 +32,7 @@ class Grid2DScene(BaseTwoDimensionialScene):
         super().construct()
 
 
-class Grid2DSceneWithAcceleration(BaseTwoDimensionialScene):
+class Grid2DSceneWithAcceleration(TwoDimensionialScene):
     def setup(self):
         super().setup()
         self._config_to_render = Grid2D()
@@ -44,7 +44,7 @@ class Grid2DSceneWithAcceleration(BaseTwoDimensionialScene):
         super().construct()
 
 
-class Grid2DSceneWithUrgencies(BaseTwoDimensionialScene):
+class Grid2DSceneWithUrgencies(TwoDimensionialScene):
     def setup(self):
         super().setup()
         self._config_to_render = Grid2D()
@@ -56,7 +56,7 @@ class Grid2DSceneWithUrgencies(BaseTwoDimensionialScene):
         super().construct()
 
 
-class Grid2DWithPredatorScene(BaseTwoDimensionialScene):
+class Grid2DWithPredatorScene(TwoDimensionialScene):
     def setup(self):
         super().setup()
         self._config_to_render = Grid2DWithPredator()
@@ -66,7 +66,7 @@ class Grid2DWithPredatorScene(BaseTwoDimensionialScene):
         super().construct()
 
 
-class Grid2DWithPredatorSceneWithAcceleration(BaseTwoDimensionialScene):
+class Grid2DWithPredatorSceneWithAcceleration(TwoDimensionialScene):
     def setup(self):
         super().setup()
         self._config_to_render = Grid2DWithPredator()
@@ -78,7 +78,7 @@ class Grid2DWithPredatorSceneWithAcceleration(BaseTwoDimensionialScene):
         super().construct()
 
 
-class Grid2DWithPredatorSceneWithUrgencies(BaseTwoDimensionialScene):
+class Grid2DWithPredatorSceneWithUrgencies(TwoDimensionialScene):
     def setup(self):
         super().setup()
         self._config_to_render = Grid2DWithPredator()
@@ -90,7 +90,7 @@ class Grid2DWithPredatorSceneWithUrgencies(BaseTwoDimensionialScene):
         super().construct()
 
 
-class Grid3DScene(BaseTwoDimensionialScene):
+class Grid3DScene(ThreeDimensionialScene):
     def setup(self):
         super().setup()
         self._config_to_render = Grid3D()
@@ -100,7 +100,7 @@ class Grid3DScene(BaseTwoDimensionialScene):
         super().construct()
 
 
-class Circle2DScene(BaseTwoDimensionialScene):
+class Circle2DScene(TwoDimensionialScene):
     def setup(self):
         super().setup()
         self._config_to_render = Circle(particles_to_draw=100, radius=1.0)

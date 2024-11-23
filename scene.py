@@ -338,5 +338,9 @@ class BaseSceneMixin:
         )
 
 
-class BaseTwoDimensionialScene(BaseSceneMixin, Scene):
+class TwoDimensionialScene(BaseSceneMixin, Scene):
+    pass
+
+
+class ThreeDimensionialScene(BaseSceneMixin, ThreeDScene):
     pass
